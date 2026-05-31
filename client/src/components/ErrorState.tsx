@@ -1,0 +1,26 @@
+import { AlertCircle } from 'lucide-react';
+
+interface Props {
+  message?: string;
+  onRetry?: () => void;
+}
+
+export default function ErrorState({ message = 'Something went wrong', onRetry }: Props) {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
+        <AlertCircle size={28} className="text-red-400" />
+      </div>
+      <h3 className="text-lg font-semibold text-gray-800 mb-1">Error</h3>
+      <p className="text-sm text-gray-500 mb-4">{message}</p>
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          className="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+        >
+          Try Again
+        </button>
+      )}
+    </div>
+  );
+}
