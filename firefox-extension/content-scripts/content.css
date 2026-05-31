@@ -266,6 +266,55 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Custom sources ─────────────────────────────────────────────────────────── */
+.jc-source-row {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 0; border-bottom: 1px solid #141210;
+}
+.jc-source-row:last-child { border-bottom: none; }
+.jc-source-info { flex: 1; min-width: 0; }
+.jc-source-name { display: block; font-size: 11px; color: #e8e3dc; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.jc-source-meta { display: block; font-size: 10px; color: #3a3630; margin-top: 1px; }
+.jc-source-sync, .jc-source-del {
+  width: 24px; height: 24px; flex-shrink: 0;
+  background: none; border: none; color: #3a3630; cursor: pointer;
+  border-radius: 4px; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.jc-source-sync:hover { color: #c8894a; background: rgba(200,137,74,0.08); }
+.jc-source-del:hover { color: #f87171; background: rgba(248,113,113,0.08); }
+.jc-add-url-btn {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: #55504a; background: none; border: 1px dashed #2e2b27;
+  border-radius: 5px; padding: 7px 10px; cursor: pointer; width: 100%; margin-top: 8px;
+  transition: all 0.15s;
+}
+.jc-add-url-btn:hover { border-color: rgba(200,137,74,0.4); color: #c8894a; }
+#jc-url-input-row {
+  display: flex; gap: 6px; margin-top: 8px;
+}
+.jc-url-inp {
+  flex: 1; padding: 7px 10px; background: #141210; border: 1px solid #2e2b27;
+  border-radius: 5px; font-size: 11px; color: #e8e3dc; outline: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+}
+.jc-url-inp:focus { border-color: #c8894a; }
+.jc-url-inp::placeholder { color: #3a3630; }
+.jc-url-fetch-btn {
+  padding: 7px 11px; background: #c8894a; color: #fff; border: none;
+  border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer;
+  font-family: inherit; flex-shrink: 0; transition: background 0.15s;
+}
+.jc-url-fetch-btn:hover:not(:disabled) { background: #b87840; }
+.jc-url-fetch-btn:disabled { opacity: 0.5; cursor: default; }
+.jc-src-job-list { max-height: 340px; overflow-y: auto; }
+.jc-src-job-list::-webkit-scrollbar { width: 3px; }
+.jc-src-job-list::-webkit-scrollbar-thumb { background: #2e2b27; border-radius: 2px; }
+.jc-src-job-row { padding: 7px 0; border-bottom: 1px solid #141210; }
+.jc-src-job-row:last-child { border-bottom: none; }
+.jc-src-job-title { font-size: 12px; color: #e8e3dc; line-height: 1.4; margin-bottom: 2px; }
+.jc-src-job-meta { font-size: 10px; color: #55504a; }
+
 /* ── Card save buttons (inline on list pages) ────────────────────────────────── */
 .jc-card-save {
   display: inline-flex; align-items: center; gap: 4px;

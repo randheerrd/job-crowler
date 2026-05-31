@@ -325,6 +325,7 @@ const jcState = {
   portals: { Naukri: false, LinkedIn: true, Indeed: false, Glassdoor: false, Wellfound: false, Internshala: false, Remotive: false },
   syncing: false,
   syncProgress: null,
+  customSources: [],
 };
 
 let sidebarEl = null;
@@ -472,6 +473,22 @@ function renderDashboardView(body) {
       <span class="jc-portal-name">${name}</span>
     </div>`).join('');
 
+  const sourceRows = jcState.customSources.map(s => {
+    const ago = s.lastSync ? timeSinceJc(new Date(s.lastSync).getTime()) : 'never';
+    return `<div class="jc-source-row" data-id="${s.id}">
+      <div class="jc-source-info">
+        <span class="jc-source-name">${escHtml(s.name || s.url)}</span>
+        <span class="jc-source-meta">${s.jobCount || 0} jobs · ${ago}</span>
+      </div>
+      <button class="jc-source-sync" data-id="${s.id}" title="Re-sync">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 2.5A7 7 0 0 0 2 8H0l3 3 3-3H4a5 5 0 1 1 1.5 3.54L4.08 9.96A7 7 0 1 0 13.5 2.5Z"/></svg>
+      </button>
+      <button class="jc-source-del" data-id="${s.id}" title="Remove">
+        <svg width="10" height="10" viewBox="0 0 14 14" fill="currentColor"><path d="M1 1l12 12M13 1 1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+
   body.innerHTML = `
     <div class="jc-kw-row">
       <svg width="13" height="13" viewBox="0 0 16 16" fill="#55504a" style="flex-shrink:0;margin-top:1px">
@@ -485,6 +502,19 @@ function renderDashboardView(body) {
     </div>
     <div class="jc-section-label">Portals to sync</div>
     <div class="jc-portals-grid">${portalGrid}</div>
+    <div class="jc-section-label" style="margin-top:14px">Custom sources</div>
+    <div id="jc-source-list">${sourceRows}</div>
+    <div id="jc-add-url-wrap">
+      <button class="jc-add-url-btn" id="jc-add-url-btn">
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="currentColor"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+        Add any URL
+      </button>
+    </div>
+    <div id="jc-url-input-row" style="display:none">
+      <input class="jc-url-inp" id="jc-url-inp" type="url" placeholder="https://boards.greenhouse.io/stripe" />
+      <button class="jc-url-fetch-btn" id="jc-url-fetch-btn">Fetch</button>
+    </div>
+    <div id="jc-url-error" class="jc-error-msg"></div>
   `;
 
   body.querySelectorAll('.jc-portal-toggle').forEach(el => {
@@ -497,6 +527,101 @@ function renderDashboardView(body) {
   });
 
   document.getElementById('jc-kw-edit').addEventListener('click', () => renderKeywordEdit(body));
+
+  // Show URL input row
+  document.getElementById('jc-add-url-btn').addEventListener('click', () => {
+    document.getElementById('jc-add-url-wrap').style.display = 'none';
+    document.getElementById('jc-url-input-row').style.display = 'flex';
+    document.getElementById('jc-url-inp').focus();
+  });
+
+  // Fetch / preview source
+  const doFetch = async () => {
+    const urlVal = document.getElementById('jc-url-inp').value.trim();
+    if (!urlVal) return;
+    const errEl = document.getElementById('jc-url-error');
+    const btn = document.getElementById('jc-url-fetch-btn');
+    btn.disabled = true; btn.textContent = '…';
+    errEl.classList.remove('visible');
+    const result = await browser.runtime.sendMessage({ action: 'previewSource', url: urlVal }).catch(() => null);
+    btn.disabled = false; btn.textContent = 'Fetch';
+    if (!result?.ok || !result.jobs?.length) {
+      errEl.textContent = result?.error || 'No jobs found. The site may require JavaScript — try a direct API board (Greenhouse, Lever, Ashby).';
+      errEl.classList.add('visible'); return;
+    }
+    renderSourcePreview(body, result.jobs, urlVal, result.name || new URL(urlVal.startsWith('http') ? urlVal : 'https://'+urlVal).hostname);
+  };
+  document.getElementById('jc-url-fetch-btn').addEventListener('click', doFetch);
+  document.getElementById('jc-url-inp').addEventListener('keydown', e => { if (e.key === 'Enter') doFetch(); });
+
+  // Re-sync existing source
+  body.querySelectorAll('.jc-source-sync').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      const result = await browser.runtime.sendMessage({ action: 'syncSource', sourceId: btn.dataset.id }).catch(() => null);
+      btn.disabled = false;
+      if (result?.ok) {
+        showToast(`${result.saved || 0} jobs synced`, 'success');
+        jcState.customSources = await browser.runtime.sendMessage({ action: 'getSources' }).catch(() => []);
+        renderDashboardView(body);
+      } else showToast('Sync failed', 'error');
+    });
+  });
+
+  // Delete source
+  body.querySelectorAll('.jc-source-del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await browser.runtime.sendMessage({ action: 'deleteSource', sourceId: btn.dataset.id });
+      jcState.customSources = jcState.customSources.filter(s => s.id !== btn.dataset.id);
+      renderDashboardView(body);
+    });
+  });
+}
+
+function renderSourcePreview(body, jobs, sourceUrl, sourceName) {
+  const rows = jobs.slice(0, 30).map(j => `
+    <div class="jc-src-job-row">
+      <div class="jc-src-job-title">${escHtml(j.title)}</div>
+      <div class="jc-src-job-meta">${escHtml([j.company, j.location].filter(Boolean).join(' · '))}</div>
+    </div>`).join('');
+
+  body.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+      <button class="jc-icon-btn" id="jc-src-back" style="color:#857f78">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M10.5 3 5 8l5.5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none"/></svg>
+      </button>
+      <span style="font-size:12px;font-weight:600;color:#e8e3dc">${escHtml(sourceName)}</span>
+      <span style="font-size:11px;color:#55504a;margin-left:auto">${jobs.length} jobs</span>
+    </div>
+    <div class="jc-src-job-list">${rows}${jobs.length > 30 ? `<div style="font-size:11px;color:#3a3630;text-align:center;padding:8px 0">+ ${jobs.length - 30} more…</div>` : ''}</div>
+    <button class="jc-btn-primary" id="jc-src-save" style="width:100%;margin-top:12px">
+      Save ${jobs.length} jobs to Dashboard
+    </button>
+  `;
+
+  document.getElementById('jc-src-back').addEventListener('click', () => renderView());
+  document.getElementById('jc-src-save').addEventListener('click', async () => {
+    const btn = document.getElementById('jc-src-save');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const result = await browser.runtime.sendMessage({ action: 'saveSourceJobs', jobs, sourceUrl, sourceName }).catch(() => null);
+    if (result?.ok) {
+      jcState.customSources = await browser.runtime.sendMessage({ action: 'getSources' }).catch(() => []);
+      showToast(`${result.saved} jobs saved!`, 'success');
+      renderView();
+    } else {
+      btn.disabled = false; btn.textContent = `Save ${jobs.length} jobs to Dashboard`;
+      showToast('Save failed', 'error');
+    }
+  });
+}
+
+function timeSinceJc(ts) {
+  const m = Math.floor((Date.now() - ts) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
 }
 
 // ── Keyword edit ───────────────────────────────────────────────────────────────
@@ -647,6 +772,9 @@ async function initSidebar() {
   }
   if (stored.syncKeywords) jcState.keywords = stored.syncKeywords;
   if (stored.syncLocation) jcState.location = stored.syncLocation;
+
+  // Load custom sources
+  jcState.customSources = await browser.runtime.sendMessage({ action: 'getSources' }).catch(() => []);
 
   // Check auth — try extension storage first, fall back to web app session
   let result = await browser.runtime.sendMessage({ action: 'getMe' }).catch(() => null);

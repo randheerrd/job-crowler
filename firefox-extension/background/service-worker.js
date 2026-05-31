@@ -55,6 +55,11 @@ browser.runtime.onMessage.addListener((msg, _sender) => {
     case 'saveKeywords':   return handleSaveKeywords(msg.keywords, msg.location);
     case 'getAutofillProfile': return handleGetAutofillProfile();
     case 'checkWebAppAuth':   return handleCheckWebAppAuth();
+    case 'getSources':        return apiFetch('/sources').then(r => r.ok ? r.json() : []);
+    case 'previewSource':     return handlePreviewSource(msg.url);
+    case 'saveSourceJobs':    return handleSaveSourceJobs(msg.jobs, msg.sourceUrl, msg.sourceName);
+    case 'syncSource':        return handleSyncSource(msg.sourceId);
+    case 'deleteSource':      return apiFetch(`/sources/${msg.sourceId}`, { method: 'DELETE' }).then(r => r.ok ? { ok: true } : { ok: false });
   }
 });
 
@@ -87,6 +92,28 @@ async function handleGetMe() {
   const user = await res.json();
   await browser.storage.local.set({ user });
   return { ok: true, user };
+}
+
+// ── Custom sources ────────────────────────────────────────────────────────────
+async function handlePreviewSource(url) {
+  const res = await apiFetch('/sources/preview', { method: 'POST', body: JSON.stringify({ url }) });
+  if (!res.ok) { const d = await res.json().catch(() => ({})); return { ok: false, error: d.error || `Error ${res.status}` }; }
+  const data = await res.json();
+  return { ok: true, ...data };
+}
+
+async function handleSaveSourceJobs(jobs, sourceUrl, sourceName) {
+  const res = await apiFetch('/sources/save', { method: 'POST', body: JSON.stringify({ jobs, sourceUrl, sourceName }) });
+  if (!res.ok) return { ok: false, error: `Error ${res.status}` };
+  const data = await res.json();
+  return { ok: true, saved: data.saved };
+}
+
+async function handleSyncSource(sourceId) {
+  const res = await apiFetch(`/sources/${sourceId}/sync`, { method: 'POST' });
+  if (!res.ok) return { ok: false };
+  const data = await res.json();
+  return { ok: true, saved: data.saved };
 }
 
 // ── Auto-login from web app session ──────────────────────────────────────────
