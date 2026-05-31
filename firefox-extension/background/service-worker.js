@@ -54,6 +54,7 @@ browser.runtime.onMessage.addListener((msg, _sender) => {
     case 'getSyncState':   return Promise.resolve(syncState);
     case 'saveKeywords':   return handleSaveKeywords(msg.keywords, msg.location);
     case 'getAutofillProfile': return handleGetAutofillProfile();
+    case 'checkWebAppAuth':   return handleCheckWebAppAuth();
   }
 });
 
@@ -86,6 +87,38 @@ async function handleGetMe() {
   const user = await res.json();
   await browser.storage.local.set({ user });
   return { ok: true, user };
+}
+
+// ── Auto-login from web app session ──────────────────────────────────────────
+async function handleCheckWebAppAuth() {
+  try {
+    const tabs = await browser.tabs.query({ url: 'https://job-crowler.onrender.com/*' });
+    if (!tabs.length) return { ok: false };
+
+    const results = await browser.tabs.executeScript(tabs[0].id, {
+      code: `(function(){
+        try {
+          const raw = localStorage.getItem('auth-storage');
+          if (!raw) return null;
+          return JSON.parse(raw)?.state?.token || null;
+        } catch(e) { return null; }
+      })()`
+    });
+
+    const token = results?.[0];
+    if (!token) return { ok: false };
+
+    await browser.storage.local.set({ jwtToken: token });
+    const res = await apiFetch('/extension/me');
+    if (!res.ok) { await browser.storage.local.remove('jwtToken'); return { ok: false }; }
+
+    const user = await res.json();
+    await browser.storage.local.set({ user });
+    browser.alarms.create('periodicSync', { periodInMinutes: 240 });
+    return { ok: true, user };
+  } catch(e) {
+    return { ok: false };
+  }
 }
 
 // ── Save single job ───────────────────────────────────────────────────────────

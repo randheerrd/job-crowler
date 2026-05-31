@@ -129,28 +129,69 @@ async function scrapeAshby(url: string): Promise<ScrapedJob[]> {
 
 // ── WorkAtAStartup / YC ───────────────────────────────────────────────────────
 async function scrapeWorkAtAStartup(query?: string): Promise<ScrapedJob[]> {
-  const role = query ? encodeURIComponent(query) : '';
-  const apiUrl = `https://www.workatastartup.com/jobs?role=${role}&remote=yes&limit=50`;
-  const res = await fetch(apiUrl, { headers: { 'User-Agent': 'JobCrawler/1.0', Accept: 'application/json' } });
-
-  // Fallback: scrape the HTML page
-  const html = await res.text();
-  const $ = cheerio.load(html);
-  const jobs: ScrapedJob[] = [];
-
-  $('[class*="job-name"], [class*="listing-title"], h2 a').each((_, el) => {
-    const title = $(el).text().trim();
-    const href  = $(el).attr('href') || '';
-    const link  = href.startsWith('http') ? href : 'https://www.workatastartup.com' + href;
-    const card  = $(el).closest('[class*="job"], [class*="listing"], article');
-    const company = card.find('[class*="company"], [class*="startup"]').first().text().trim();
-    const loc     = card.find('[class*="location"]').first().text().trim();
-    if (title && link) {
-      jobs.push({ title, company: company || 'YC Company', location: loc || 'Remote', jobType: 'Full-time', url: link, portal: 'YC / Work at a Startup' });
+  // Try 1: __NEXT_DATA__ embedded in the HTML (works if site uses SSR)
+  try {
+    const url = `https://www.workatastartup.com/jobs${query ? `?role=${encodeURIComponent(query)}` : ''}`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+    });
+    const html = await res.text();
+    const $ = cheerio.load(html);
+    const nextRaw = $('#__NEXT_DATA__').text();
+    if (nextRaw) {
+      const nextData = JSON.parse(nextRaw);
+      const rawJobs: Array<Record<string, unknown>> =
+        (nextData?.props?.pageProps?.jobPostings as Array<Record<string, unknown>>) ||
+        (nextData?.props?.pageProps?.jobs as Array<Record<string, unknown>>) ||
+        [];
+      if (rawJobs.length > 0) {
+        return rawJobs.map(j => ({
+          title: String(j.title || j.role_title || j.name || ''),
+          company: String((j.company as Record<string, unknown>)?.name || (j.startup as Record<string, unknown>)?.name || 'YC Company'),
+          location: j.remote ? 'Remote' : String(j.location || 'Remote'),
+          jobType: String(j.employment_type || j.type || 'Full-time'),
+          url: `https://www.workatastartup.com/jobs/${j.id || j.slug}`,
+          portal: 'YC / Work at a Startup',
+        })).filter(j => j.title && j.url);
+      }
     }
-  });
+  } catch { /* fall through */ }
 
-  return jobs;
+  // Try 2: HN Algolia public API — reliable structured job data
+  return scrapeHNJobs(query);
+}
+
+async function scrapeHNJobs(query?: string): Promise<ScrapedJob[]> {
+  const q = query ? encodeURIComponent(query) : 'software';
+  const res = await fetch(
+    `https://hn.algolia.com/api/v1/search?tags=job&query=${q}&hitsPerPage=50`,
+    { headers: { 'User-Agent': 'JobCrawler/1.0' } }
+  );
+  if (!res.ok) return [];
+  const data = await res.json() as { hits: Array<{
+    objectID: string; title?: string; url?: string; story_text?: string;
+  }> };
+
+  return (data.hits || []).map(h => {
+    const title = h.title || '';
+    const parts = title.split(/\s*[|]\s*/);
+    const company = parts.length > 1 ? parts[0].trim() : 'Unknown';
+    const role = parts.length > 1 ? parts[1].trim() : title.trim();
+    const locMatch = title.match(/\(([^)]+)\)$/);
+    const location = locMatch ? locMatch[1] : (title.toLowerCase().includes('remote') ? 'Remote' : 'Not specified');
+    return {
+      title: role || title,
+      company,
+      location,
+      jobType: 'Full-time',
+      url: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`,
+      description: h.story_text?.slice(0, 500),
+      portal: 'YC / Work at a Startup',
+    };
+  }).filter(j => j.title);
 }
 
 // ── Generic HTML scraper (fallback) ───────────────────────────────────────────

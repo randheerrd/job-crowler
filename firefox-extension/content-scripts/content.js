@@ -648,8 +648,11 @@ async function initSidebar() {
   if (stored.syncKeywords) jcState.keywords = stored.syncKeywords;
   if (stored.syncLocation) jcState.location = stored.syncLocation;
 
-  // Check auth
-  const result = await browser.runtime.sendMessage({ action: 'getMe' }).catch(() => null);
+  // Check auth — try extension storage first, fall back to web app session
+  let result = await browser.runtime.sendMessage({ action: 'getMe' }).catch(() => null);
+  if (!result?.ok) {
+    result = await browser.runtime.sendMessage({ action: 'checkWebAppAuth' }).catch(() => null);
+  }
   if (result?.ok && result.user) {
     jcState.user = result.user;
     jcState.keywords = result.user?.keywords || result.user?.skills || jcState.keywords;

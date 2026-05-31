@@ -21,7 +21,11 @@ async function init() {
   const { jwtToken, user, syncPortals, lastSync, syncKeywords, syncLocation } =
     await browser.storage.local.get(['jwtToken', 'user', 'syncPortals', 'lastSync', 'syncKeywords', 'syncLocation']);
 
-  if (!jwtToken || !user) { showView(loginView); return; }
+  if (!jwtToken || !user) {
+    const webAuth = await browser.runtime.sendMessage({ action: 'checkWebAppAuth' }).catch(() => null);
+    if (webAuth?.ok) { init(); return; }
+    showView(loginView); return;
+  }
 
   // Show user chip
   userChip.style.display = 'flex';
