@@ -12,7 +12,7 @@ export default function LoadingSpinner({ size = 'md', className, fullPage }: Pro
   const spinner = (
     <div
       className={cn(
-        'rounded-full border-2 border-gray-200 border-t-primary-500 animate-spin',
+        'rounded-full border-2 border-gray-300 border-t-primary-500 animate-spin',
         sizes[size],
         className
       )}

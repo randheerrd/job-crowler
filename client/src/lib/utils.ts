@@ -21,23 +21,23 @@ export function formatSalary(salary: string | null): string {
   return salary || 'Not disclosed';
 }
 
-// Render-style: muted opacity badges on pure-black bg
+// Attio-style: muted opacity badges for dark warm backgrounds
 export const PORTAL_COLORS: Record<string, string> = {
-  LinkedIn:    'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-  Naukri:      'bg-orange-500/10 text-orange-400 border border-orange-500/20',
-  Indeed:      'bg-violet-500/10 text-violet-400 border border-violet-500/20',
-  Internshala: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-  Wellfound:   'bg-rose-500/10 text-rose-400 border border-rose-500/20',
-  Remotive:    'bg-teal-500/10 text-teal-400 border border-teal-500/20',
+  LinkedIn:    'bg-blue-500/10 text-blue-400 border border-blue-500/15',
+  Naukri:      'bg-orange-500/10 text-orange-400 border border-orange-500/15',
+  Indeed:      'bg-violet-500/10 text-violet-400 border border-violet-500/15',
+  Internshala: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/15',
+  Wellfound:   'bg-rose-500/10 text-rose-400 border border-rose-500/15',
+  Remotive:    'bg-teal-500/10 text-teal-400 border border-teal-500/15',
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  Saved:                'bg-gray-500/10 text-gray-600 border border-gray-500/20',
-  Applied:              'bg-blue-500/10 text-blue-400 border border-blue-500/20',
-  'Interview Scheduled':'bg-amber-500/10 text-amber-400 border border-amber-500/20',
-  'Offer Received':     'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
-  Rejected:             'bg-red-500/10 text-red-400 border border-red-500/20',
-  Withdrawn:            'bg-gray-500/10 text-gray-500 border border-gray-500/20',
+  Saved:                'bg-gray-400/10 text-gray-600',
+  Applied:              'bg-blue-500/10 text-blue-400',
+  'Interview Scheduled':'bg-amber-500/10 text-amber-400',
+  'Offer Received':     'bg-emerald-500/10 text-emerald-400',
+  Rejected:             'bg-red-500/10 text-red-400',
+  Withdrawn:            'bg-gray-400/10 text-gray-500',
 };
 
 export const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Remote', 'Hybrid', 'Internship'];

@@ -8,17 +8,17 @@ import KanbanView from './KanbanView';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import EmptyState from '../../components/EmptyState';
 import ErrorState from '../../components/ErrorState';
-import { cn, APPLICATION_STATUSES, STATUS_COLORS } from '../../lib/utils';
+import { cn, APPLICATION_STATUSES } from '../../lib/utils';
 import AddApplicationModal from './AddApplicationModal';
 
 type ViewMode = 'table' | 'kanban';
 
-const STATUS_PILL_COLORS: Record<string, string> = {
+const STATUS_COLORS: Record<string, string> = {
   Saved:                'bg-gray-400/10 border-gray-400/20 text-gray-600',
-  Applied:              'bg-blue-500/15 border-blue-500/25 text-blue-400',
-  'Interview Scheduled':'bg-amber-500/15 border-amber-500/25 text-amber-400',
-  'Offer Received':     'bg-emerald-500/15 border-emerald-500/25 text-emerald-400',
-  Rejected:             'bg-red-500/15 border-red-500/25 text-red-400',
+  Applied:              'bg-blue-500/10 border-blue-500/20 text-blue-400',
+  'Interview Scheduled':'bg-amber-500/10 border-amber-500/20 text-amber-400',
+  'Offer Received':     'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+  Rejected:             'bg-red-500/10 border-red-500/20 text-red-400',
   Withdrawn:            'bg-gray-400/10 border-gray-400/20 text-gray-500',
 };
 
@@ -36,7 +36,6 @@ export default function Tracker() {
     },
   });
 
-  // Use unfiltered applications for stats
   const { data: allApplications = [] } = useQuery<Application[]>({
     queryKey: ['applications', ''],
     queryFn: () => api.get('/applications').then(r => r.data),
@@ -61,96 +60,80 @@ export default function Tracker() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Applications</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="text-base font-semibold text-gray-900">Applications</h1>
+          <p className="text-xs text-gray-600 mt-0.5">
             {allApplications.length} application{allApplications.length !== 1 ? 's' : ''} tracked
           </p>
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors self-start sm:self-auto"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white text-xs font-medium rounded hover:bg-primary-600 transition-colors"
         >
-          <Plus size={16} />
-          Add Entry
+          <Plus size={13} />
+          Add entry
         </button>
       </div>
 
-      {/* Stats pills */}
-      <div className="flex flex-wrap gap-2">
-        {APPLICATION_STATUSES.map(s => {
-          const count = allApplications.filter(a => a.status === s).length;
-          return (
-            <span
-              key={s}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border',
-                STATUS_PILL_COLORS[s] || 'bg-gray-100 text-gray-600 border-gray-200'
-              )}
-            >
-              {s}
-              <span className="font-bold">{count}</span>
-            </span>
-          );
-        })}
-      </div>
-
-      {/* Controls row: view toggle + status filter chips */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+      {/* Controls: view + filter */}
+      <div className="flex items-center gap-3 flex-wrap">
         {/* View toggle */}
-        <div className="flex items-center bg-gray-100 rounded-lg p-1 shrink-0">
+        <div className="flex items-center border border-gray-300 rounded overflow-hidden shrink-0">
           <button
             onClick={() => setView('table')}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
-              view === 'table' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              'flex items-center gap-1.5 px-2.5 h-7 text-xs font-medium transition-colors',
+              view === 'table' ? 'bg-gray-300 text-gray-900' : 'text-gray-600 hover:text-gray-800'
             )}
           >
-            <Table2 size={13} />
-            Table
+            <Table2 size={12} /> Table
           </button>
+          <div className="w-px h-4 bg-gray-300" />
           <button
             onClick={() => setView('kanban')}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors',
-              view === 'kanban' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              'flex items-center gap-1.5 px-2.5 h-7 text-xs font-medium transition-colors',
+              view === 'kanban' ? 'bg-gray-300 text-gray-900' : 'text-gray-600 hover:text-gray-800'
             )}
           >
-            <LayoutGrid size={13} />
-            Kanban
+            <LayoutGrid size={12} /> Kanban
           </button>
         </div>
 
-        {/* Status filter chips */}
-        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {/* Status filter */}
+        <div className="flex gap-1.5 overflow-x-auto no-scrollbar flex-1">
           <button
             onClick={() => setStatusFilter('')}
             className={cn(
-              'px-3 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap shrink-0',
+              'px-2.5 py-1 text-xs rounded border transition-colors whitespace-nowrap shrink-0',
               !statusFilter
-                ? 'bg-primary-500/10 border border-primary-500/30 text-primary-400'
-                : 'border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                ? 'bg-primary-500/15 border-primary-500/25 text-primary-400'
+                : 'border-gray-300 text-gray-600 hover:border-gray-400'
             )}
           >
             All
           </button>
-          {APPLICATION_STATUSES.map(s => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s === statusFilter ? '' : s)}
-              className={cn(
-                'px-3 py-1.5 text-xs font-medium rounded-full transition-all whitespace-nowrap shrink-0',
-                s === statusFilter
-                  ? 'bg-primary-500/10 border border-primary-500/30 text-primary-400'
-                  : 'border border-gray-200 text-gray-500 hover:border-gray-300 hover:text-gray-700'
-              )}
-            >
-              {s}
-            </button>
-          ))}
+          {APPLICATION_STATUSES.map(s => {
+            const count = allApplications.filter(a => a.status === s).length;
+            return (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s === statusFilter ? '' : s)}
+                className={cn(
+                  'flex items-center gap-1.5 px-2.5 py-1 text-xs rounded border transition-colors whitespace-nowrap shrink-0',
+                  s === statusFilter
+                    ? 'bg-primary-500/15 border-primary-500/25 text-primary-400'
+                    : cn('border', STATUS_COLORS[s] || 'border-gray-300 text-gray-600')
+                )}
+              >
+                {s}
+                <span className="font-semibold">{count}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -163,32 +146,31 @@ export default function Tracker() {
         <EmptyState
           icon={ClipboardList}
           title="No applications yet"
-          description="Start tracking jobs by clicking 'Track' on any job listing, or add a manual entry."
+          description="Start tracking from job listings, or add a manual entry."
           action={
             <button
               onClick={() => setShowAdd(true)}
-              className="flex items-center gap-1.5 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white text-xs font-medium rounded hover:bg-primary-600 transition-colors"
             >
-              <Plus size={16} />
-              Add Entry
+              <Plus size={13} />
+              Add entry
             </button>
           }
         />
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 p-5">
+        <div className="bg-gray-200 border border-gray-300 rounded overflow-hidden">
           {view === 'table' ? (
             <TableView applications={applications} onUpdated={handleUpdated} onDeleted={handleDeleted} />
           ) : (
-            <KanbanView applications={applications} onUpdated={handleUpdated} onDeleted={handleDeleted} />
+            <div className="p-4">
+              <KanbanView applications={applications} onUpdated={handleUpdated} onDeleted={handleDeleted} />
+            </div>
           )}
         </div>
       )}
 
       {showAdd && (
-        <AddApplicationModal
-          onClose={() => setShowAdd(false)}
-          onAdded={handleAdded}
-        />
+        <AddApplicationModal onClose={() => setShowAdd(false)} onAdded={handleAdded} />
       )}
     </div>
   );
