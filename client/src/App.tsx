@@ -7,10 +7,12 @@ import Dashboard from './pages/Dashboard';
 import JobDetail from './pages/JobDetail';
 import Tracker from './pages/Tracker';
 import Settings from './pages/Settings';
+import Documents from './pages/Documents';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Onboarding from './pages/Onboarding';
 import LoadingSpinner from './components/LoadingSpinner';
+import Toaster from './components/Toaster';
 
 function AppRoutes() {
   const { isAuthenticated, user, setAuth } = useAuthStore();
@@ -53,6 +55,7 @@ function AppRoutes() {
       >
         <Route index element={<Dashboard />} />
         <Route path="jobs/:id" element={<JobDetail />} />
+        <Route path="documents" element={<Documents />} />
         <Route path="tracker" element={<Tracker />} />
         <Route path="settings" element={<Settings />} />
       </Route>
@@ -65,6 +68,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
+      <Toaster />
     </BrowserRouter>
   );
 }

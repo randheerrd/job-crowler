@@ -25,7 +25,7 @@ export default function ResumeStep({ onNext }: Props) {
     try {
       const fd = new FormData();
       fd.append('resume', f);
-      const { data } = await api.post<Resume>('/resume', fd, {
+      const { data } = await api.post<Resume>('/resumes', fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setResume(data);
@@ -51,7 +51,7 @@ export default function ResumeStep({ onNext }: Props) {
     if (!resume) { onNext(); return; }
     setSaving(true);
     try {
-      await api.put(`/resume/${resume.id}/skills`, { skills });
+      await api.put(`/resumes/${resume.id}/skills`, { skills });
       onNext();
     } catch {
       setError('Failed to save skills.');

@@ -24,7 +24,7 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
-app.use('/api/resume', resumeRoutes);
+app.use('/api/resumes', resumeRoutes);
 app.use('/api/credentials', credentialRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);

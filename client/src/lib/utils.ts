@@ -23,20 +23,21 @@ export function formatSalary(salary: string | null): string {
 }
 
 export const PORTAL_COLORS: Record<string, string> = {
-  LinkedIn:    'bg-amber-100 text-amber-800',
-  Naukri:      'bg-orange-100 text-orange-800',
-  Indeed:      'bg-yellow-100 text-yellow-800',
-  Internshala: 'bg-lime-100 text-lime-800',
-  Wellfound:   'bg-rose-100 text-rose-800',
+  LinkedIn:    'bg-blue-100 text-blue-700',
+  Naukri:      'bg-orange-100 text-orange-700',
+  Indeed:      'bg-violet-100 text-violet-700',
+  Internshala: 'bg-emerald-100 text-emerald-700',
+  Wellfound:   'bg-rose-100 text-rose-700',
+  Remotive:    'bg-teal-100 text-teal-700',
 };
 
 export const STATUS_COLORS: Record<string, string> = {
-  Saved:                'bg-stone-200 text-stone-700',
-  Applied:              'bg-amber-100 text-amber-800',
-  'Interview Scheduled':'bg-yellow-100 text-yellow-800',
-  'Offer Received':     'bg-green-100 text-green-800',
-  Rejected:             'bg-red-100 text-red-700',
-  Withdrawn:            'bg-stone-100 text-stone-500',
+  Saved:                'bg-slate-100 text-slate-600',
+  Applied:              'bg-blue-100 text-blue-700',
+  'Interview Scheduled':'bg-amber-100 text-amber-700',
+  'Offer Received':     'bg-emerald-100 text-emerald-700',
+  Rejected:             'bg-red-100 text-red-600',
+  Withdrawn:            'bg-gray-100 text-gray-500',
 };
 
 export const JOB_TYPES = ['Full-time', 'Part-time', 'Contract', 'Remote', 'Hybrid', 'Internship'];

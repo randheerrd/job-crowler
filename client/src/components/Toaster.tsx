@@ -1,0 +1,37 @@
+import { X } from 'lucide-react';
+import { useToastStore } from '../store/toastStore';
+import { cn } from '../lib/utils';
+
+export default function Toaster() {
+  const { toasts, dismiss } = useToastStore();
+
+  if (toasts.length === 0) return null;
+
+  return (
+    <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none">
+      {toasts.map(t => (
+        <div
+          key={t.id}
+          className="flex items-center gap-3 bg-slate-900 border border-slate-700 shadow-xl rounded-full px-4 py-2.5 pointer-events-auto min-w-[220px] max-w-sm"
+          style={{ transform: 'translateY(0)', transition: 'all 0.2s ease' }}
+        >
+          <span
+            className={cn(
+              'w-2 h-2 rounded-full shrink-0',
+              t.type === 'success' && 'bg-emerald-400',
+              t.type === 'error' && 'bg-red-400',
+              t.type === 'info' && 'bg-blue-400',
+            )}
+          />
+          <span className="flex-1 text-sm text-white font-medium leading-snug">{t.message}</span>
+          <button
+            onClick={() => dismiss(t.id)}
+            className="text-slate-400 hover:text-white transition-colors shrink-0"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
