@@ -8,6 +8,12 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PUPPETEER_SKIP_DOWNLOAD
+        value: "true"
+      - key: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD
+        value: "true"
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
       - key: DATABASE_URL
         sync: false
       - key: JWT_SECRET
