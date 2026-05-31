@@ -11,8 +11,8 @@ import Documents from './pages/Documents';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Onboarding from './pages/Onboarding';
-import LoadingSpinner from './components/LoadingSpinner';
 import Toaster from './components/Toaster';
+import BootScreen from './components/BootScreen';
 
 function AppRoutes() {
   const { isAuthenticated, user, setAuth } = useAuthStore();
@@ -21,13 +21,13 @@ function AppRoutes() {
 
   useEffect(() => {
     if (isDev && !isAuthenticated) {
-      api.get('/auth/dev-login')
-        .then(r => setAuth(r.data.user, r.data.token))
-        .finally(() => setBooting(false));
+      const minDelay = new Promise(res => setTimeout(res, 4200));
+      const login = api.get('/auth/dev-login').then(r => setAuth(r.data.user, r.data.token));
+      Promise.all([login, minDelay]).finally(() => setBooting(false));
     }
   }, []);
 
-  if (booting) return <LoadingSpinner fullPage />;
+  if (booting) return <BootScreen />;
 
   if (!isAuthenticated) {
     return (
