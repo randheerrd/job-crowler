@@ -6,41 +6,56 @@
   * { box-sizing: border-box; }
 
   body {
-    background-color: #f1f5f9;
-    color: #0f172a;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #09071a;
+    color: #f0edff;
+    font-family: 'Plus Jakarta Sans', Inter, system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     font-size: 14px;
     line-height: 1.6;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', sans-serif;
-    letter-spacing: -0.02em;
-    color: #0f172a;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    letter-spacing: -0.025em;
+    color: #f0edff;
   }
 
   input, select, textarea {
-    font-family: 'Inter', sans-serif;
-    background-color: #ffffff;
-    color: #0f172a;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #17132e;
+    color: #f0edff;
+    border: 1px solid #2a2350;
   }
 
   input::placeholder, textarea::placeholder {
-    color: #94a3b8;
+    color: #6b5f9e;
   }
 
-  button { font-family: 'Inter', sans-serif; }
+  button { font-family: 'Plus Jakarta Sans', sans-serif; }
 
   ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-  ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+  ::-webkit-scrollbar-thumb { background: #2a2350; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #9333ea; }
 }
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #c084fc, #f0abfc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-btn {
+    background: linear-gradient(135deg, #9333ea, #d946ef);
+  }
+  .gradient-btn:hover {
+    background: linear-gradient(135deg, #7e22ce, #c026d3);
+  }
 
   .line-clamp-2 {
     display: -webkit-box;

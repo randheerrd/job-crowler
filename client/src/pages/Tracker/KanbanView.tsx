@@ -10,12 +10,12 @@ interface Props {
 }
 
 const COLUMN_COLORS: Record<string, string> = {
-  Saved:                'bg-slate-100 border-slate-200 text-slate-600',
-  Applied:              'bg-blue-50 border-blue-200 text-blue-700',
-  'Interview Scheduled':'bg-amber-50 border-amber-200 text-amber-700',
-  'Offer Received':     'bg-emerald-50 border-emerald-200 text-emerald-700',
-  Rejected:             'bg-red-50 border-red-200 text-red-600',
-  Withdrawn:            'bg-gray-50 border-gray-200 text-gray-500',
+  Saved:                'bg-gray-300/10 border-gray-300/20 text-gray-600',
+  Applied:              'bg-blue-500/10 border-blue-500/20 text-blue-400',
+  'Interview Scheduled':'bg-amber-500/10 border-amber-500/20 text-amber-400',
+  'Offer Received':     'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+  Rejected:             'bg-red-500/10 border-red-500/20 text-red-400',
+  Withdrawn:            'bg-gray-300/10 border-gray-300/20 text-gray-500',
 };
 
 function getTitle(app: Application): string {
@@ -56,7 +56,7 @@ function KanbanCard({ app, onUpdated, onDeleted }: KanbanCardProps) {
   const portal = app.job?.portal;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-card hover:shadow-card-hover transition-shadow group/card relative">
+    <div className="bg-white rounded-xl border border-gray-300 p-4 shadow-card hover:shadow-glow-sm hover:border-primary-500/30 transition-all group/card relative">
       {/* Delete button — hidden until hover */}
       <button
         onClick={handleDelete}

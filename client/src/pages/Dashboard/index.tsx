@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, RefreshCw, Briefcase, Bookmark, TrendingUp, Users, Sparkles } from 'lucide-react';
+import { Search, RefreshCw, Briefcase, Bookmark, TrendingUp, Users } from 'lucide-react';
 import api from '../../lib/axios';
 import type { JobFilters, JobsResponse, Application } from '../../types';
 import JobCard from './JobCard';
@@ -51,7 +51,7 @@ export default function Dashboard() {
     onSuccess: (result) => {
       qc.invalidateQueries({ queryKey: ['jobs'] });
       const added = result.added ?? 0;
-      toast(added > 0 ? `${added} new jobs found!` : 'You\'re up to date', added > 0 ? 'success' : 'info');
+      toast(added > 0 ? `${added} new jobs found!` : "You're all caught up", added > 0 ? 'success' : 'info');
     },
     onError: () => toast('Could not fetch jobs right now', 'error'),
   });
@@ -86,36 +86,38 @@ export default function Dashboard() {
   const savedCount = jobs.filter(j => j.isSaved).length;
   const firstName = user?.name?.split(' ')[0] || 'there';
 
-  const chipClass = (active: boolean) => cn(
-    'px-3 py-1.5 text-xs font-medium rounded-full border transition-all whitespace-nowrap shrink-0 cursor-pointer',
+  const chip = (active: boolean) => cn(
+    'px-3.5 py-1.5 text-xs font-semibold rounded-full border transition-all whitespace-nowrap shrink-0 cursor-pointer',
     active
-      ? 'bg-primary-600 border-primary-600 text-white shadow-sm'
-      : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'
+      ? 'bg-primary-600/20 border-primary-500/40 text-primary-400'
+      : 'border-gray-300 text-gray-600 hover:border-gray-400 hover:text-gray-700 bg-transparent'
   );
 
   return (
     <div className="space-y-6">
-      {/* Hero banner */}
-      <div className="relative bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 rounded-2xl p-6 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white translate-x-16 -translate-y-16" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white -translate-x-12 translate-y-12" />
-        </div>
-        <div className="relative flex items-center justify-between gap-4">
+      {/* Hero */}
+      <div className="relative rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #1e0a3c 0%, #2d1065 50%, #1a0a2e 100%)' }}>
+        {/* Glow orbs */}
+        <div className="absolute top-0 left-1/4 w-64 h-64 rounded-full blur-3xl opacity-20" style={{ background: '#9333ea' }} />
+        <div className="absolute bottom-0 right-1/4 w-48 h-48 rounded-full blur-3xl opacity-15" style={{ background: '#d946ef' }} />
+
+        <div className="relative px-8 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <p className="text-primary-200 text-sm font-medium mb-1 flex items-center gap-1.5">
-              <Sparkles size={13} />
-              Hey {firstName}!
+            <p className="text-primary-300 text-sm font-semibold mb-2 tracking-wide">
+              Welcome back, {firstName} 👋
             </p>
-            <h1 className="text-2xl font-bold text-white mb-1">Find your next opportunity</h1>
-            <p className="text-primary-200 text-sm">
-              {total > 0 ? `${total} jobs aggregated across all portals` : 'Refresh to discover live job listings'}
+            <h1 className="text-3xl font-bold text-white leading-tight mb-2">
+              Find your next<br />
+              <span className="gradient-text">opportunity</span>
+            </h1>
+            <p className="text-gray-600 text-sm">
+              {total > 0 ? `${total} jobs aggregated from all portals` : 'Hit refresh to pull live listings'}
             </p>
           </div>
           <button
             onClick={() => refreshMutation.mutate()}
             disabled={refreshMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white text-primary-700 text-sm font-semibold rounded-xl hover:bg-primary-50 disabled:opacity-70 transition-colors shrink-0"
+            className="flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white gradient-btn shadow-glow disabled:opacity-60 transition-all shrink-0"
           >
             <RefreshCw size={15} className={refreshMutation.isPending ? 'animate-spin' : ''} />
             {refreshMutation.isPending ? 'Fetching…' : 'Refresh Jobs'}
@@ -123,21 +125,21 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats row */}
+      {/* Stats */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[
-          { label: 'Jobs Available', value: total, icon: Briefcase, color: 'bg-blue-50 text-blue-600' },
-          { label: 'Tracked', value: applications.length, icon: TrendingUp, color: 'bg-primary-50 text-primary-600' },
-          { label: 'Interviews', value: interviewCount, icon: Users, color: 'bg-amber-50 text-amber-600' },
-          { label: 'Saved', value: savedCount, icon: Bookmark, color: 'bg-emerald-50 text-emerald-600' },
-        ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3 shadow-card">
-            <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center shrink-0', color)}>
-              <Icon size={18} />
+          { label: 'Jobs Available',   value: total,                icon: Briefcase,   color: 'text-blue-400',    bg: 'bg-blue-500/10' },
+          { label: 'Tracked',          value: applications.length,  icon: TrendingUp,  color: 'text-primary-400', bg: 'bg-primary-500/10' },
+          { label: 'Interviews',       value: interviewCount,       icon: Users,       color: 'text-amber-400',   bg: 'bg-amber-500/10' },
+          { label: 'Saved',            value: savedCount,           icon: Bookmark,    color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+        ].map(({ label, value, icon: Icon, color, bg }) => (
+          <div key={label} className="bg-white rounded-2xl border border-gray-300 p-4 flex items-center gap-3 shadow-card">
+            <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center shrink-0', bg)}>
+              <Icon size={18} className={color} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-900 leading-none">{value}</p>
-              <p className="text-xs text-slate-500 mt-1">{label}</p>
+              <p className="text-2xl font-bold text-gray-900 leading-none">{value}</p>
+              <p className="text-xs text-gray-600 mt-1">{label}</p>
             </div>
           </div>
         ))}
@@ -145,13 +147,13 @@ export default function Dashboard() {
 
       {/* Search */}
       <div className="relative">
-        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" />
         <input
           type="text"
           value={search}
           onChange={e => { setSearch(e.target.value); setFilters(f => ({ ...f, page: 1 })); }}
-          className="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl text-sm bg-white shadow-card focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-shadow"
-          placeholder="Search by title, company, or skill…"
+          className="w-full pl-11 pr-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+          placeholder="Search by title, company, skill…"
         />
       </div>
 
@@ -159,17 +161,17 @@ export default function Dashboard() {
       <div className="space-y-2">
         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           {PORTAL_OPTIONS.map(p => (
-            <button key={p} onClick={() => handlePortalChip(p)} className={chipClass(selectedPortal === p)}>{p}</button>
+            <button key={p} onClick={() => handlePortalChip(p)} className={chip(selectedPortal === p)}>{p}</button>
           ))}
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
           {JOB_TYPE_OPTIONS.map(t => (
-            <button key={t} onClick={() => handleJobTypeChip(t)} className={chipClass(selectedJobType === t)}>{t}</button>
+            <button key={t} onClick={() => handleJobTypeChip(t)} className={chip(selectedJobType === t)}>{t}</button>
           ))}
         </div>
       </div>
 
-      {/* Jobs grid */}
+      {/* Jobs */}
       {isLoading ? (
         <LoadingSpinner fullPage />
       ) : isError ? (
@@ -178,22 +180,16 @@ export default function Dashboard() {
         <EmptyState
           icon={Briefcase}
           title={total === 0 ? 'No jobs yet' : 'No results'}
-          description={total === 0 ? 'Hit "Refresh Jobs" to pull live listings from job portals.' : 'Try a different search or clear your filters.'}
+          description={total === 0 ? 'Hit Refresh Jobs to pull live listings.' : 'Try different filters or clear search.'}
           action={
-            total === 0 ? (
-              <button
-                onClick={() => refreshMutation.mutate()}
-                disabled={refreshMutation.isPending}
-                className="flex items-center gap-2 px-5 py-2.5 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors"
-              >
-                <RefreshCw size={15} className={refreshMutation.isPending ? 'animate-spin' : ''} />
-                Refresh Jobs
-              </button>
-            ) : (
-              <button onClick={handleReset} className="px-5 py-2.5 bg-primary-600 text-white text-sm font-semibold rounded-xl hover:bg-primary-700 transition-colors">
-                Clear filters
-              </button>
-            )
+            <button
+              onClick={total === 0 ? () => refreshMutation.mutate() : handleReset}
+              disabled={total === 0 && refreshMutation.isPending}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold text-white gradient-btn shadow-glow disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={refreshMutation.isPending ? 'animate-spin' : ''} />
+              {total === 0 ? 'Refresh Jobs' : 'Clear filters'}
+            </button>
           }
         />
       ) : (
@@ -207,31 +203,25 @@ export default function Dashboard() {
               <button
                 onClick={() => setFilters(f => ({ ...f, page: Math.max(1, (f.page || 1) - 1) }))}
                 disabled={(filters.page || 1) <= 1}
-                className="px-4 py-2 border border-slate-200 bg-white text-sm rounded-lg disabled:opacity-40 hover:bg-slate-50 transition-colors"
-              >
-                Previous
-              </button>
+                className="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-xl disabled:opacity-40 hover:bg-gray-200 transition-colors"
+              >Previous</button>
               {Array.from({ length: Math.min(pages, 7) }, (_, i) => i + 1).map(page => (
                 <button
                   key={page}
                   onClick={() => setFilters(f => ({ ...f, page }))}
                   className={cn(
-                    'w-9 h-9 text-sm rounded-lg transition-colors font-medium',
+                    'w-9 h-9 text-sm rounded-xl transition-colors font-semibold',
                     (filters.page || 1) === page
-                      ? 'bg-primary-600 text-white'
-                      : 'border border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
+                      ? 'gradient-btn text-white shadow-glow-sm'
+                      : 'border border-gray-300 text-gray-700 hover:bg-gray-200'
                   )}
-                >
-                  {page}
-                </button>
+                >{page}</button>
               ))}
               <button
                 onClick={() => setFilters(f => ({ ...f, page: Math.min(pages, (f.page || 1) + 1) }))}
                 disabled={(filters.page || 1) >= pages}
-                className="px-4 py-2 border border-slate-200 bg-white text-sm rounded-lg disabled:opacity-40 hover:bg-slate-50 transition-colors"
-              >
-                Next
-              </button>
+                className="px-4 py-2 border border-gray-300 text-gray-700 text-sm rounded-xl disabled:opacity-40 hover:bg-gray-200 transition-colors"
+              >Next</button>
             </div>
           )}
         </>

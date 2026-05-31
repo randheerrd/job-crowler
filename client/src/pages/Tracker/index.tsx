@@ -14,12 +14,12 @@ import AddApplicationModal from './AddApplicationModal';
 type ViewMode = 'table' | 'kanban';
 
 const STATUS_PILL_COLORS: Record<string, string> = {
-  Saved:                'bg-slate-100 border-slate-200 text-slate-600',
-  Applied:              'bg-blue-100 border-blue-200 text-blue-700',
-  'Interview Scheduled':'bg-amber-100 border-amber-200 text-amber-700',
-  'Offer Received':     'bg-emerald-100 border-emerald-200 text-emerald-700',
-  Rejected:             'bg-red-100 border-red-200 text-red-600',
-  Withdrawn:            'bg-gray-100 border-gray-200 text-gray-500',
+  Saved:                'bg-gray-400/10 border-gray-400/20 text-gray-600',
+  Applied:              'bg-blue-500/15 border-blue-500/25 text-blue-400',
+  'Interview Scheduled':'bg-amber-500/15 border-amber-500/25 text-amber-400',
+  'Offer Received':     'bg-emerald-500/15 border-emerald-500/25 text-emerald-400',
+  Rejected:             'bg-red-500/15 border-red-500/25 text-red-400',
+  Withdrawn:            'bg-gray-400/10 border-gray-400/20 text-gray-500',
 };
 
 export default function Tracker() {
