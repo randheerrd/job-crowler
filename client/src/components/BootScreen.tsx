@@ -47,10 +47,13 @@ export default function BootScreen() {
     <div className="fixed inset-0 bg-[#0a0a0a] z-50 overflow-hidden flex flex-col">
       {/* Brand */}
       <div className="px-8 pt-7 pb-4 flex items-center gap-2.5">
-        <span className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#0a0a0a]" />
-        </span>
-        <span className="text-white font-semibold text-lg tracking-tight">JobCrawler</span>
+        <svg width="22" height="22" viewBox="0 0 60 60" fill="none" className="text-white">
+          <defs><clipPath id="bc-clip"><circle cx="28" cy="30" r="24"/></clipPath></defs>
+          <circle cx="28" cy="30" r="26" stroke="currentColor" strokeWidth="3.5"/>
+          <circle cx="37" cy="30" r="19" stroke="currentColor" strokeWidth="3.5" clipPath="url(#bc-clip)"/>
+          <circle cx="46" cy="30" r="11" stroke="currentColor" strokeWidth="3.5" clipPath="url(#bc-clip)"/>
+        </svg>
+        <span className="text-white font-semibold text-lg tracking-tight">Calos</span>
       </div>
 
       {/* Log stream */}

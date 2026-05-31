@@ -1,0 +1,93 @@
+{
+  "manifest_version": 2,
+  "name": "Calos",
+  "version": "2.1.0",
+  "description": "Auto-fetch jobs from LinkedIn, Naukri, Indeed and 20+ portals based on your profile. No manual searching.",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "jobcrawler@jobcrawler.app",
+      "strict_min_version": "109.0"
+    }
+  },
+
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs",
+    "alarms",
+    "https://job-crowler.onrender.com/*",
+    "https://www.linkedin.com/*",
+    "https://in.indeed.com/*",
+    "https://www.indeed.com/*",
+    "https://www.naukri.com/*",
+    "https://www.glassdoor.com/*",
+    "https://www.glassdoor.co.in/*",
+    "https://wellfound.com/*",
+    "https://internshala.com/*",
+    "https://remotive.com/*",
+    "https://www.dice.com/*",
+    "https://www.ziprecruiter.com/*",
+    "https://www.monster.com/*",
+    "https://www.shine.com/*",
+    "https://www.timesjobs.com/*",
+    "https://www.reed.co.uk/*",
+    "https://www.seek.com.au/*",
+    "https://www.jobstreet.com/*",
+    "https://himalayas.app/*",
+    "https://weworkremotely.com/*"
+  ],
+
+  "browser_action": {
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "48":  "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "JobCrawler — Toggle Sidebar"
+  },
+
+  "background": {
+    "scripts": ["background/service-worker.js"],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.linkedin.com/jobs/*",
+        "https://in.indeed.com/*",
+        "https://www.indeed.com/*",
+        "https://www.naukri.com/*",
+        "https://www.glassdoor.com/*",
+        "https://www.glassdoor.co.in/*",
+        "https://wellfound.com/*",
+        "https://internshala.com/*",
+        "https://remotive.com/*",
+        "https://www.dice.com/*",
+        "https://www.ziprecruiter.com/*",
+        "https://www.monster.com/*",
+        "https://www.shine.com/*",
+        "https://www.reed.co.uk/*",
+        "https://www.seek.com.au/*",
+        "https://www.jobstreet.com/*",
+        "https://himalayas.app/*",
+        "https://weworkremotely.com/*"
+      ],
+      "js": ["content-scripts/content.js"],
+      "css": ["content-scripts/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  }
+}

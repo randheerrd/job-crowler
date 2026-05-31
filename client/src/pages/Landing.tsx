@@ -73,7 +73,7 @@ const STEPS = [
   {
     num: '02',
     title: 'Crawl all portals at once',
-    desc: 'Hit "Refresh jobs" and JobCrawler fetches live listings from all 6 portals simultaneously.',
+    desc: 'Hit "Refresh jobs" and Calos fetches live listings from all 6 portals simultaneously.',
   },
   {
     num: '03',
@@ -90,10 +90,13 @@ export default function Landing() {
       <header className="sticky top-0 z-40 border-b border-gray-300" style={{ backgroundColor: 'rgba(15,14,13,0.92)', backdropFilter: 'blur(10px)' }}>
         <div className="max-w-5xl mx-auto px-6 h-12 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-5 h-5 rounded bg-primary-500 flex items-center justify-center shrink-0">
-              <span className="text-white font-bold leading-none" style={{ fontSize: '9px', letterSpacing: 0 }}>JC</span>
-            </div>
-            <span className="text-sm font-semibold text-gray-900" style={{ letterSpacing: '-0.02em' }}>JobCrawler</span>
+            <svg width="18" height="18" viewBox="0 0 60 60" fill="none" className="shrink-0 text-primary-500">
+              <defs><clipPath id="nav-clip"><circle cx="28" cy="30" r="24"/></clipPath></defs>
+              <circle cx="28" cy="30" r="26" stroke="currentColor" strokeWidth="3.5"/>
+              <circle cx="37" cy="30" r="19" stroke="currentColor" strokeWidth="3.5" clipPath="url(#nav-clip)"/>
+              <circle cx="46" cy="30" r="11" stroke="currentColor" strokeWidth="3.5" clipPath="url(#nav-clip)"/>
+            </svg>
+            <span className="text-sm font-semibold text-gray-900" style={{ letterSpacing: '-0.02em' }}>Calos</span>
           </div>
 
           <nav className="hidden md:flex items-center gap-6">
@@ -134,7 +137,7 @@ export default function Landing() {
 
           <p className="text-sm text-gray-600 leading-relaxed max-w-lg mb-8">
             Stop opening LinkedIn, Naukri, Wellfound, and Indeed in separate tabs every morning.
-            JobCrawler pulls live listings from 6 portals into one clean table — filter, save, apply, and track
+            Calos pulls live listings from 6 portals into one clean table — filter, save, apply, and track
             everything in one place.
           </p>
 
@@ -274,7 +277,7 @@ export default function Landing() {
             Everything you need, nothing you don't
           </h2>
           <p className="text-sm text-gray-600 mb-8 max-w-lg">
-            JobCrawler is focused on one thing: making your job search faster and more organised. No bloat, no upsells.
+            Calos is focused on one thing: making your job search faster and more organised. No bloat, no upsells.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -429,7 +432,7 @@ export default function Landing() {
                 right now.
               </p>
               <p>
-                JobCrawler is that tool. I built it for myself first. Now it's free for anyone who's
+                Calos is that tool. I built it for myself first. Now it's free for anyone who's
                 going through the same grind.
               </p>
             </div>
@@ -494,10 +497,13 @@ export default function Landing() {
       <footer className="border-t border-gray-300 py-6">
         <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-primary-500 flex items-center justify-center shrink-0">
-              <span className="text-white font-bold leading-none" style={{ fontSize: '7px', letterSpacing: 0 }}>JC</span>
-            </div>
-            <span className="text-xs text-gray-700 font-semibold">JobCrawler</span>
+            <svg width="14" height="14" viewBox="0 0 60 60" fill="none" className="shrink-0 text-primary-500">
+              <defs><clipPath id="foot-clip"><circle cx="28" cy="30" r="24"/></clipPath></defs>
+              <circle cx="28" cy="30" r="26" stroke="currentColor" strokeWidth="3.5"/>
+              <circle cx="37" cy="30" r="19" stroke="currentColor" strokeWidth="3.5" clipPath="url(#foot-clip)"/>
+              <circle cx="46" cy="30" r="11" stroke="currentColor" strokeWidth="3.5" clipPath="url(#foot-clip)"/>
+            </svg>
+            <span className="text-xs text-gray-700 font-semibold">Calos</span>
           </div>
           <p className="text-xs text-gray-500">Built because job searching shouldn't feel like a second job.</p>
           <div className="flex items-center gap-4">

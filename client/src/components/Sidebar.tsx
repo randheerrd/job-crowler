@@ -1,12 +1,15 @@
 import { NavLink, Link } from 'react-router-dom';
-import { Search, ClipboardList, FileText, Settings, LogOut } from 'lucide-react';
+import { Search, ClipboardList, FileText, Settings, LogOut, Puzzle, Globe } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuthStore } from '../store/authStore';
+import CalosLogo from './CalosLogo';
 
 const NAV = [
   { to: '/', icon: Search, label: 'Discover', end: true },
   { to: '/tracker', icon: ClipboardList, label: 'Applications' },
   { to: '/documents', icon: FileText, label: 'Documents' },
+  { to: '/sources', icon: Globe, label: 'Sources' },
+  { to: '/extension', icon: Puzzle, label: 'Extension' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -19,10 +22,8 @@ export default function Sidebar() {
       {/* Brand */}
       <div className="h-11 flex items-center px-3.5 border-b border-gray-300 shrink-0">
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-5 h-5 rounded bg-primary-500 flex items-center justify-center shrink-0">
-            <span className="text-white font-bold leading-none" style={{ fontSize: '9px', letterSpacing: 0 }}>JC</span>
-          </div>
-          <span className="text-sm font-semibold text-gray-900" style={{ letterSpacing: '-0.02em' }}>JobCrawler</span>
+          <CalosLogo size={18} className="shrink-0 text-primary-500" />
+          <span className="text-sm font-semibold text-gray-900" style={{ letterSpacing: '-0.02em' }}>Calos</span>
         </Link>
       </div>
 

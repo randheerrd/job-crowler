@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calos</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 340px; background: #0f0e0d; color: #e8e3dc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px; letter-spacing: -0.01em; -webkit-font-smoothing: antialiased;
+    }
+    .header {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 14px; border-bottom: 1px solid #1c1a17;
+    }
+    .logo-icon {
+      width: 20px; height: 20px; background: #c8894a; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .logo-text { font-size: 13px; font-weight: 600; letter-spacing: -0.02em; flex: 1; }
+    .user-chip { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #857f78; }
+    .user-avatar {
+      width: 18px; height: 18px; border-radius: 50%; background: #2e2b27;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 600; color: #857f78; flex-shrink: 0;
+    }
+    .icon-btn {
+      width: 24px; height: 24px; background: none; border: none; color: #3a3630;
+      cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, color 0.15s; flex-shrink: 0;
+    }
+    .icon-btn:hover { background: #1c1a17; color: #857f78; }
+    .view { display: none; }
+    .view.active { display: block; }
+    /* Login */
+    .login-body { padding: 20px 16px 16px; }
+    .login-title { font-size: 13px; font-weight: 600; color: #e8e3dc; margin-bottom: 3px; }
+    .login-sub { font-size: 11px; color: #55504a; margin-bottom: 16px; line-height: 1.5; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 11px; color: #857f78; margin-bottom: 4px; font-weight: 500; }
+    .field input {
+      width: 100%; padding: 7px 10px; background: #141210; border: 1px solid #2e2b27;
+      border-radius: 5px; font-size: 12px; color: #e8e3dc; outline: none; font-family: inherit;
+    }
+    .field input:focus { border-color: #c8894a; }
+    .error-msg {
+      font-size: 11px; color: #f87171; background: rgba(248,113,113,0.08);
+      border: 1px solid rgba(248,113,113,0.2); border-radius: 4px;
+      padding: 6px 10px; margin-bottom: 10px; display: none;
+    }
+    .error-msg.visible { display: block; }
+    .btn-primary {
+      width: 100%; padding: 8px; background: #c8894a; color: #fff;
+      border: none; border-radius: 5px; font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: inherit; letter-spacing: -0.01em;
+    }
+    .btn-primary:hover:not(:disabled) { background: #b87840; }
+    .btn-primary:disabled { opacity: 0.55; cursor: default; }
+    /* Dashboard */
+    .dash-body { padding: 12px 14px 0; }
+    .section-label {
+      font-size: 10px; font-weight: 600; color: #3a3630;
+      text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px;
+    }
+    .keywords-row {
+      display: flex; align-items: flex-start; gap: 6px;
+      background: #141210; border: 1px solid #1c1a17; border-radius: 6px;
+      padding: 9px 10px; margin-bottom: 10px;
+    }
+    .kw-icon { color: #55504a; flex-shrink: 0; margin-top: 1px; }
+    .kw-content { flex: 1; min-width: 0; }
+    .kw-title { font-size: 10px; color: #55504a; margin-bottom: 4px; }
+    .kw-chips { display: flex; flex-wrap: wrap; gap: 3px; }
+    .kw-chip {
+      font-size: 10px; padding: 1px 6px; border-radius: 3px;
+      background: #1c1a17; border: 1px solid #2e2b27; color: #857f78;
+    }
+    .kw-edit { font-size: 10px; color: #3a3630; cursor: pointer; flex-shrink: 0; background: none; border: none; font-family: inherit; }
+    .kw-edit:hover { color: #c8894a; }
+    .portals-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 12px; }
+    .portal-toggle {
+      display: flex; align-items: center; gap: 6px; padding: 6px 8px;
+      border-radius: 5px; cursor: pointer; border: 1px solid #1c1a17;
+      background: #141210; user-select: none;
+    }
+    .portal-toggle.on { border-color: rgba(200,137,74,0.3); background: rgba(200,137,74,0.05); }
+    .portal-dot { width: 6px; height: 6px; border-radius: 50%; background: #2e2b27; flex-shrink: 0; }
+    .portal-toggle.on .portal-dot { background: #c8894a; }
+    .portal-name { font-size: 11px; color: #55504a; }
+    .portal-toggle.on .portal-name { color: #e8e3dc; }
+    .sync-btn {
+      width: 100%; padding: 9px; margin-bottom: 10px;
+      background: #c8894a; color: #fff; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit;
+      letter-spacing: -0.01em; display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .sync-btn:hover:not(:disabled) { background: #b87840; }
+    .sync-btn:disabled { opacity: 0.5; cursor: default; }
+    .last-sync { font-size: 11px; color: #3a3630; text-align: center; padding-bottom: 12px; }
+    .last-sync span { color: #55504a; }
+    .footer-actions {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; border-top: 1px solid #141210;
+    }
+    .dash-link { font-size: 11px; color: #c8894a; text-decoration: none; }
+    .dash-link:hover { opacity: 0.8; }
+    .logout-btn { font-size: 11px; color: #3a3630; background: none; border: none; cursor: pointer; font-family: inherit; }
+    .logout-btn:hover { color: #f87171; }
+    /* Sync progress */
+    .sync-body { padding: 14px; }
+    .sync-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .sync-title { font-size: 12px; font-weight: 600; color: #e8e3dc; flex: 1; }
+    .progress-wrap { height: 3px; background: #1c1a17; border-radius: 2px; margin-bottom: 12px; overflow: hidden; }
+    .progress-bar { height: 100%; background: #c8894a; border-radius: 2px; transition: width 0.4s; }
+    .portal-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #141210; }
+    .portal-row:last-child { border-bottom: none; }
+    .pr-icon { width: 14px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+    .pr-name { font-size: 12px; color: #55504a; flex: 1; }
+    .pr-name.running { color: #e8e3dc; }
+    .pr-name.done { color: #55504a; }
+    .pr-count { font-size: 11px; color: #3a3630; }
+    .pr-count.has { color: #4ade80; }
+    .spin { width: 12px; height: 12px; border: 2px solid #2e2b27; border-top-color: #c8894a; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sync-total { text-align: center; font-size: 12px; color: #55504a; margin-top: 10px; padding-top: 10px; border-top: 1px solid #141210; }
+    .sync-total strong { color: #4ade80; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-icon" style="background:transparent;width:20px;height:20px">
+      <svg width="20" height="20" viewBox="0 0 60 60" fill="none">
+        <defs><clipPath id="pp-clip"><circle cx="28" cy="30" r="23.5"/></clipPath></defs>
+        <circle cx="28" cy="30" r="25.5" stroke="#c8894a" stroke-width="4"/>
+        <circle cx="37" cy="30" r="18.5" stroke="#c8894a" stroke-width="4" clip-path="url(#pp-clip)"/>
+        <circle cx="46" cy="30" r="10.5" stroke="#c8894a" stroke-width="4" clip-path="url(#pp-clip)"/>
+      </svg>
+    </div>
+    <span class="logo-text">Calos</span>
+    <div class="user-chip" id="userChip" style="display:none">
+      <div class="user-avatar" id="userAvatar"></div>
+      <span id="userName" style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    </div>
+    <button class="icon-btn" id="settingsBtn" style="display:none" title="Settings">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M9.33 1H6.67l-.44 2.2a5.98 5.98 0 0 0-1.53.88L2.56 3.2 1.24 5.56l1.72 1.44a6 6 0 0 0 0 1.99L1.24 10.44 2.56 12.8l2.14-.88c.46.35.97.63 1.53.88L6.67 15h2.66l.44-2.2a5.98 5.98 0 0 0 1.53-.88l2.14.88 1.32-2.36-1.72-1.44a6 6 0 0 0 0-1.99l1.72-1.44-1.32-2.36-2.14.88A5.98 5.98 0 0 0 9.77 3.2L9.33 1Z"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Login -->
+  <div class="view" id="loginView">
+    <div class="login-body">
+      <div class="login-title">Sign in to Calos</div>
+      <div class="login-sub">Auto-fetch matching jobs from LinkedIn, Naukri, Indeed and more.</div>
+      <div class="error-msg" id="loginError"></div>
+      <div class="field"><label>Email</label><input type="email" id="emailInput" placeholder="you@example.com" /></div>
+      <div class="field" style="margin-bottom:14px"><label>Password</label><input type="password" id="passwordInput" placeholder="••••••••" /></div>
+      <button class="btn-primary" id="loginBtn">Sign in</button>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="view" id="dashboardView">
+    <div class="dash-body">
+      <div class="keywords-row">
+        <svg class="kw-icon" width="12" height="12" viewBox="0 0 16 16" fill="#55504a">
+          <path d="M6 1a5 5 0 1 0 4.09 7.88l3.26 3.26 1.06-1.06-3.26-3.26A5 5 0 0 0 6 1Zm0 1.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Z"/>
+        </svg>
+        <div class="kw-content">
+          <div class="kw-title">Searching for</div>
+          <div class="kw-chips" id="kwChips"><span class="kw-chip" style="color:#3a3630">No keywords</span></div>
+        </div>
+        <button class="kw-edit" id="editKwBtn">Edit</button>
+      </div>
+
+      <div class="section-label">Portals to sync</div>
+      <div class="portals-grid" id="portalsGrid"></div>
+
+      <button class="sync-btn" id="syncBtn">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M13.5 2.5A7 7 0 0 0 2 8H0l3 3 3-3H4a5 5 0 1 1 1.5 3.54L4.08 9.96A7 7 0 1 0 13.5 2.5Z"/>
+        </svg>
+        Sync Jobs Now
+      </button>
+      <div class="last-sync" id="lastSyncInfo">Never synced</div>
+    </div>
+    <div class="footer-actions">
+      <a class="dash-link" id="dashLink" href="https://job-crowler.onrender.com" target="_blank">Open Dashboard ↗</a>
+      <button class="logout-btn" id="logoutBtn">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Sync progress -->
+  <div class="view" id="syncView">
+    <div class="sync-body">
+      <div class="sync-header">
+        <div class="spin"></div>
+        <div class="sync-title" id="syncTitle">Fetching jobs…</div>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+      <div id="syncPortalList"></div>
+      <div class="sync-total" id="syncTotal"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

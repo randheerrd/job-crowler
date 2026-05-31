@@ -34,7 +34,25 @@ router.post('/', async (req: AuthRequest, res: Response): Promise<void> => {
       return;
     }
 
-    const PORTALS = ['LinkedIn', 'Naukri', 'Indeed', 'Internshala', 'Wellfound'];
+    const PORTALS = [
+      // Global
+      'LinkedIn', 'Indeed', 'Glassdoor', 'Monster', 'ZipRecruiter', 'CareerBuilder',
+      'SimplyHired', 'Dice', 'Hired',
+      // Startup / Tech
+      'Wellfound', 'Remotive', 'We Work Remotely', 'Otta', 'Cutshort',
+      'HackerEarth Jobs', 'Himalayas',
+      // India
+      'Naukri', 'Internshala', 'Shine', 'TimesJobs', 'Apna', 'WorkIndia',
+      'iimjobs', 'Instahyre',
+      // Europe
+      'Stepstone', 'XING', 'Totaljobs', 'Reed', 'CV-Library',
+      // Asia Pacific
+      'JobStreet', 'Seek', 'JobsDB',
+      // Middle East
+      'Bayt', 'GulfTalent', 'Naukrigulf',
+      // Remote-first
+      'Remote.co', 'FlexJobs',
+    ];
     if (!PORTALS.includes(portal)) {
       res.status(400).json({ error: 'Invalid portal' });
       return;

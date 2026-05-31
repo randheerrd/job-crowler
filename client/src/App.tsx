@@ -7,11 +7,14 @@ import Dashboard from './pages/Dashboard';
 import JobDetail from './pages/JobDetail';
 import Tracker from './pages/Tracker';
 import Settings from './pages/Settings';
+import Extension from './pages/Extension';
+import Sources from './pages/Sources';
 import Documents from './pages/Documents';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Onboarding from './pages/Onboarding';
 import Landing from './pages/Landing';
+import AuthCallback from './pages/AuthCallback';
 import Toaster from './components/Toaster';
 import BootScreen from './components/BootScreen';
 
@@ -36,6 +39,7 @@ function AppRoutes() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
@@ -59,6 +63,8 @@ function AppRoutes() {
         <Route path="jobs/:id" element={<JobDetail />} />
         <Route path="documents" element={<Documents />} />
         <Route path="tracker" element={<Tracker />} />
+        <Route path="sources" element={<Sources />} />
+        <Route path="extension" element={<Extension />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

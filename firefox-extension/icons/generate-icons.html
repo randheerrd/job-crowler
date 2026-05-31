@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generate JobCrawler Icons</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #111; color: #eee; padding: 40px; }
+    h2 { margin-bottom: 24px; }
+    .row { display: flex; gap: 32px; align-items: flex-end; flex-wrap: wrap; }
+    .item { text-align: center; }
+    canvas { display: block; image-rendering: pixelated; }
+    p { font-size: 12px; color: #888; margin-top: 8px; }
+    .dl {
+      display: inline-block; margin-top: 8px;
+      padding: 6px 14px; background: #c8894a; color: #fff;
+      border: none; border-radius: 5px; font-size: 12px;
+      cursor: pointer; text-decoration: none;
+    }
+    .dl:hover { background: #b87840; }
+    .note { margin-top: 32px; padding: 16px; background: #1c1a17; border: 1px solid #2e2b27;
+            border-radius: 6px; font-size: 13px; color: #857f78; line-height: 1.7; }
+    code { background: #0f0e0d; padding: 2px 6px; border-radius: 3px; color: #c8894a; }
+  </style>
+</head>
+<body>
+  <h2>JobCrawler Icon Generator</h2>
+  <p style="color:#857f78;margin-bottom:24px">
+    Click Download for each size, then put the files in <code>chrome-extension/icons/</code>
+  </p>
+  <div class="row" id="icons"></div>
+
+  <div class="note">
+    <strong>After downloading:</strong><br/>
+    Save as <code>icon16.png</code>, <code>icon48.png</code>, <code>icon128.png</code>
+    in the <code>icons/</code> folder. These are required before loading the extension.
+  </div>
+
+  <script>
+    const SIZES = [16, 48, 128];
+
+    SIZES.forEach(size => {
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      const r = size * 0.18;
+
+      // Background: amber #c8894a
+      ctx.fillStyle = '#c8894a';
+      ctx.beginPath();
+      ctx.moveTo(r, 0);
+      ctx.lineTo(size - r, 0);
+      ctx.quadraticCurveTo(size, 0, size, r);
+      ctx.lineTo(size, size - r);
+      ctx.quadraticCurveTo(size, size, size - r, size);
+      ctx.lineTo(r, size);
+      ctx.quadraticCurveTo(0, size, 0, size - r);
+      ctx.lineTo(0, r);
+      ctx.quadraticCurveTo(0, 0, r, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // Subtle inner gradient
+      const grad = ctx.createLinearGradient(0, 0, 0, size);
+      grad.addColorStop(0, 'rgba(255,255,255,0.12)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.08)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(r, 0);
+      ctx.lineTo(size - r, 0);
+      ctx.quadraticCurveTo(size, 0, size, r);
+      ctx.lineTo(size, size - r);
+      ctx.quadraticCurveTo(size, size, size - r, size);
+      ctx.lineTo(r, size);
+      ctx.quadraticCurveTo(0, size, 0, size - r);
+      ctx.lineTo(0, r);
+      ctx.quadraticCurveTo(0, 0, r, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      // "JC" text
+      const fontSize = size * 0.38;
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `700 ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.letterSpacing = '-1px';
+      ctx.fillText('JC', size / 2, size / 2 + size * 0.03);
+
+      // Container
+      const item = document.createElement('div');
+      item.className = 'item';
+
+      const display = document.createElement('canvas');
+      display.width  = Math.max(size, 64);
+      display.height = Math.max(size, 64);
+      const dCtx = display.getContext('2d');
+      const scale = Math.max(size, 64) / size;
+      dCtx.imageSmoothingEnabled = false;
+      dCtx.drawImage(canvas, 0, 0, Math.max(size, 64), Math.max(size, 64));
+
+      const label = document.createElement('p');
+      label.textContent = `${size}×${size}`;
+
+      const dl = document.createElement('a');
+      dl.className = 'dl';
+      dl.textContent = 'Download';
+      dl.download = `icon${size}.png`;
+      dl.href = canvas.toDataURL('image/png');
+
+      item.appendChild(display);
+      item.appendChild(label);
+      item.appendChild(dl);
+      document.getElementById('icons').appendChild(item);
+    });
+  </script>
+</body>
+</html>
