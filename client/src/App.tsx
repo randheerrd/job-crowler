@@ -7,14 +7,18 @@ import Dashboard from './pages/Dashboard';
 import JobDetail from './pages/JobDetail';
 import Tracker from './pages/Tracker';
 import Settings from './pages/Settings';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Onboarding from './pages/Onboarding';
 import LoadingSpinner from './components/LoadingSpinner';
 
 function AppRoutes() {
-  const { isAuthenticated, setAuth } = useAuthStore();
-  const [booting, setBooting] = useState(!isAuthenticated);
+  const { isAuthenticated, user, setAuth } = useAuthStore();
+  const isDev = import.meta.env.DEV;
+  const [booting, setBooting] = useState(isDev && !isAuthenticated);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (isDev && !isAuthenticated) {
       api.get('/auth/dev-login')
         .then(r => setAuth(r.data.user, r.data.token))
         .finally(() => setBooting(false));
@@ -23,9 +27,30 @@ function AppRoutes() {
 
   if (booting) return <LoadingSpinner fullPage />;
 
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  const onboardingDone = user?.profileData?.onboardingComplete === true;
+
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/register" element={<Navigate to="/" replace />} />
+      <Route
+        path="/onboarding"
+        element={onboardingDone ? <Navigate to="/" replace /> : <Onboarding />}
+      />
+      <Route
+        path="/"
+        element={onboardingDone ? <Layout /> : <Navigate to="/onboarding" replace />}
+      >
         <Route index element={<Dashboard />} />
         <Route path="jobs/:id" element={<JobDetail />} />
         <Route path="tracker" element={<Tracker />} />

@@ -10,7 +10,7 @@ export function authMiddleware(req: AuthRequest, res: Response, next: NextFuncti
   const authHeader = req.headers.authorization;
   const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
 
-  if (token === 'dev-token') {
+  if (token === 'dev-token' && process.env.NODE_ENV !== 'production') {
     prisma.user.findFirst().then(user => {
       if (user) { req.userId = user.id; next(); }
       else res.status(401).json({ error: 'No users in DB' });

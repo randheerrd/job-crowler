@@ -7,6 +7,10 @@ import { authMiddleware, AuthRequest } from '../middleware/auth';
 const router = Router();
 
 router.get('/dev-login', async (req: Request, res: Response): Promise<void> => {
+  if (process.env.NODE_ENV === 'production') {
+    res.status(404).json({ error: 'Not available' });
+    return;
+  }
   try {
     let user = await prisma.user.findFirst();
     if (!user) {

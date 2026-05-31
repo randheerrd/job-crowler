@@ -1,7 +1,15 @@
-import puppeteer, { Browser } from 'puppeteer';
 import type { FetchedJob } from './jobFetchers';
 
-async function launchBrowser(): Promise<Browser> {
+const isProd = process.env.NODE_ENV === 'production';
+
+// Puppeteer is only used in local dev — portal scraping is disabled in production
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let puppeteer: any = null;
+if (!isProd) {
+  puppeteer = require('puppeteer');
+}
+
+async function launchBrowser() {
   return puppeteer.launch({
     headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-blink-features=AutomationControlled'],
@@ -15,7 +23,8 @@ export async function scrapeNaukri(
   query: string,
   location: string
 ): Promise<FetchedJob[]> {
-  let browser: Browser | null = null;
+  if (isProd) return [];
+  let browser = null;
   try {
     browser = await launchBrowser();
     const page = await browser.newPage();
@@ -61,7 +70,7 @@ export async function scrapeNaukri(
       }).filter(j => j.title && j.company && j.url);
     });
 
-    return jobs.map(j => ({
+    return jobs.map((j: any) => ({
       portal: 'Naukri',
       title: j.title,
       company: j.company,
@@ -86,7 +95,8 @@ export async function scrapeInternshala(
   password: string,
   query: string
 ): Promise<FetchedJob[]> {
-  let browser: Browser | null = null;
+  if (isProd) return [];
+  let browser = null;
   try {
     browser = await launchBrowser();
     const page = await browser.newPage();
@@ -125,7 +135,7 @@ export async function scrapeInternshala(
       }).filter(j => j.title && j.company && j.url);
     });
 
-    return jobs.map(j => ({
+    return jobs.map((j: any) => ({
       portal: 'Internshala',
       title: j.title,
       company: j.company,
@@ -150,7 +160,8 @@ export async function scrapeWellfound(
   password: string,
   query: string
 ): Promise<FetchedJob[]> {
-  let browser: Browser | null = null;
+  if (isProd) return [];
+  let browser = null;
   try {
     browser = await launchBrowser();
     const page = await browser.newPage();
@@ -188,7 +199,7 @@ export async function scrapeWellfound(
       }).filter(j => j.title && j.company && j.url);
     });
 
-    return jobs.map(j => ({
+    return jobs.map((j: any) => ({
       portal: 'Wellfound',
       title: j.title,
       company: j.company,
