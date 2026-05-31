@@ -4,46 +4,53 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Render's violet-purple brand
+        // Render's purple — accent only, not backgrounds
         primary: {
-          50:  '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc',
-          500: '#a855f7',
-          600: '#9333ea',
-          700: '#7e22ce',
-          800: '#6b21a8',
-          900: '#581c87',
-          950: '#3b0764',
+          50:  '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+          950: '#2e1065',
         },
-        // Inverted gray scale — Render dark palette
-        // gray-50 = darkest (page bg), gray-900 = lightest (text)
+        // Inverted gray — pure black dark theme (Render-style)
+        // gray-50 = darkest (page bg),  gray-900 = lightest (text)
         gray: {
-          50:  '#09071a',   // page background
-          100: '#100d27',   // sidebar
-          200: '#17132e',   // card surface
-          300: '#2a2350',   // borders
-          400: '#463d6e',   // muted borders
-          500: '#6b5f9e',   // placeholder / muted
-          600: '#9d91cc',   // secondary text
-          700: '#c5bff0',   // body text
-          800: '#ddd8fa',   // subheadings
-          900: '#f0edff',   // primary text (lightest)
+          50:  '#0a0a0a',  // page background
+          100: '#111111',  // sidebar / secondary surface
+          200: '#161616',  // card surface
+          300: '#262626',  // borders
+          400: '#3a3a3a',  // subtle dividers
+          500: '#555555',  // placeholder / disabled
+          600: '#888888',  // secondary text
+          700: '#aaaaaa',  // body text
+          800: '#d4d4d4',  // subheadings
+          900: '#f5f5f5',  // primary text
         },
-        // white = elevated card surface
-        white: '#1e1840',
+        white: '#161616',   // elevated card surface
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
+      fontSize: {
+        '2xs': ['0.625rem', { lineHeight: '1rem' }],
       },
       boxShadow: {
-        'glow-sm': '0 0 12px 0 rgba(147,51,234,0.15)',
-        'glow':    '0 0 24px 0 rgba(147,51,234,0.20)',
-        'glow-lg': '0 0 40px 0 rgba(147,51,234,0.25)',
-        'card':    '0 1px 3px rgba(0,0,0,0.4)',
-        'card-hover': '0 4px 20px rgba(0,0,0,0.5)',
+        'card': '0 0 0 1px rgba(255,255,255,0.04)',
+        'card-hover': '0 0 0 1px rgba(139,92,246,0.4)',
+        'glow': '0 0 20px rgba(124,58,237,0.25)',
+      },
+      keyframes: {
+        fadeIn: { from: { opacity: '0', transform: 'translateY(4px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+      },
+      animation: {
+        fadeIn: 'fadeIn 0.2s ease',
       },
     },
   },

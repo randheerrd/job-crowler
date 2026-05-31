@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Bookmark, BookmarkCheck, ArrowUpRight, Plus, Check, Sparkles } from 'lucide-react';
+import { MapPin, Briefcase, Bookmark, BookmarkCheck, ArrowUpRight, Plus, Check } from 'lucide-react';
 import { cn, PORTAL_COLORS, formatDate, formatSalary } from '../../lib/utils';
 import api from '../../lib/axios';
 import type { Job } from '../../types';
@@ -11,147 +11,111 @@ interface Props {
   onSaveToggle?: (id: string, saved: boolean) => void;
 }
 
-const AVATAR_GRADIENTS = [
-  'from-blue-500 to-indigo-600', 'from-violet-500 to-purple-600',
-  'from-rose-500 to-pink-600', 'from-amber-500 to-orange-600',
-  'from-emerald-500 to-teal-600', 'from-cyan-500 to-blue-600',
-  'from-fuchsia-500 to-pink-600', 'from-indigo-500 to-blue-600',
+const AVATAR_COLORS = [
+  '#3b82f6','#8b5cf6','#ec4899','#f59e0b',
+  '#10b981','#06b6d4','#f97316','#6366f1',
 ];
-
-function companyGradient(name: string) {
+function avatarColor(name: string) {
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
-  return AVATAR_GRADIENTS[h % AVATAR_GRADIENTS.length];
-}
-
-// Derive "highlight" tags Otta-style from job data
-function highlights(job: Job): string[] {
-  const tags: string[] = [];
-  if (/remote/i.test(job.jobType) || /remote/i.test(job.location)) tags.push('🌍 Remote-friendly');
-  if (job.salary) tags.push('💰 Salary shared');
-  if (/intern/i.test(job.jobType)) tags.push('🎓 Internship');
-  if (/senior|lead|staff|principal/i.test(job.title)) tags.push('⭐ Senior role');
-  tags.push(`💼 ${job.jobType}`);
-  return tags.slice(0, 4);
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
 }
 
 export default function JobCard({ job, onSaveToggle }: Props) {
   const [saved, setSaved] = useState(job.isSaved ?? false);
   const [savingJob, setSavingJob] = useState(false);
-  const [tracking, setTracking] = useState(false);
   const [tracked, setTracked] = useState(false);
   const { toast } = useToastStore();
 
   const handleSave = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     setSavingJob(true);
     try {
       if (saved) {
         await api.delete(`/jobs/save/${job.id}`);
-        setSaved(false);
-        onSaveToggle?.(job.id, false);
+        setSaved(false); onSaveToggle?.(job.id, false);
       } else {
         await api.post(`/jobs/save/${job.id}`);
-        setSaved(true);
-        onSaveToggle?.(job.id, true);
-        toast('Saved to your list');
+        setSaved(true); onSaveToggle?.(job.id, true);
+        toast('Saved');
       }
-    } finally {
-      setSavingJob(false);
-    }
+    } finally { setSavingJob(false); }
   };
 
   const handleTrack = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (tracking || tracked) return;
-    setTracking(true);
+    e.preventDefault(); e.stopPropagation();
+    if (tracked) return;
     try {
       await api.post('/applications', { jobId: job.id, status: 'Applied' });
-      setTracked(true);
-      toast('Added to your tracker!');
-    } catch {
-      setTracked(true);
-      toast('Already in your tracker', 'info');
-    } finally {
-      setTracking(false);
-    }
+      setTracked(true); toast('Added to tracker');
+    } catch { setTracked(true); toast('Already tracked', 'info'); }
   };
 
-  const tags = highlights(job);
+  const color = avatarColor(job.company);
 
   return (
     <Link
       to={`/jobs/${job.id}`}
-      className="block bg-white rounded-3xl border border-slate-200/80 p-6 hover:border-primary-300 hover:shadow-card-hover transition-all duration-200 group"
+      className="block bg-gray-200 border border-gray-300 rounded p-4 hover:border-gray-400 hover:bg-gray-200/80 transition-all group"
     >
-      {/* Header: logo + company + save */}
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div className="flex items-center gap-3.5 min-w-0">
-          <div className={cn(
-            'w-14 h-14 rounded-2xl bg-gradient-to-br flex items-center justify-center font-bold text-white text-xl shrink-0 shadow-sm',
-            companyGradient(job.company)
-          )}>
+      {/* Top row */}
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          {/* Company avatar */}
+          <div
+            className="w-9 h-9 rounded flex items-center justify-center font-bold text-white text-sm shrink-0"
+            style={{ backgroundColor: color + '22', color }}
+          >
             {job.company.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold text-slate-700 truncate">{job.company}</p>
-              <span className={cn('text-[11px] font-medium px-1.5 py-0.5 rounded-md shrink-0', PORTAL_COLORS[job.portal] || 'bg-gray-100 text-gray-600')}>
-                {job.portal}
-              </span>
-            </div>
-            <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1">
-              <MapPin size={10} />
-              {job.location}
-            </p>
+            <p className="text-sm font-medium text-gray-800 truncate leading-tight">{job.company}</p>
+            <span className={cn('text-[11px] font-medium px-1.5 py-0.5 rounded-sm inline-block mt-0.5', PORTAL_COLORS[job.portal] || 'bg-gray-300 text-gray-600')}>
+              {job.portal}
+            </span>
           </div>
         </div>
         <button
           onClick={handleSave}
           disabled={savingJob}
-          className={cn(
-            'p-2.5 rounded-xl transition-all shrink-0',
-            saved ? 'text-primary-600 bg-primary-50' : 'text-slate-300 hover:text-primary-500 hover:bg-primary-50'
-          )}
+          className={cn('p-1.5 rounded transition-colors shrink-0', saved ? 'text-primary-400' : 'text-gray-500 hover:text-primary-400')}
         >
-          {saved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+          {saved ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
         </button>
       </div>
 
       {/* Title */}
-      <h3 className="text-lg font-bold text-slate-900 group-hover:text-primary-600 transition-colors leading-snug mb-1">
+      <h3 className="text-sm font-semibold text-gray-900 group-hover:text-primary-400 transition-colors line-clamp-2 leading-snug mb-2">
         {job.title}
       </h3>
-      {job.salary && (
-        <p className="text-sm font-semibold text-emerald-600 mb-3">{formatSalary(job.salary)}</p>
-      )}
 
-      {/* Highlight tags */}
-      <div className="flex flex-wrap gap-2 mb-5 mt-3">
-        {tags.map(tag => (
-          <span key={tag} className="text-xs font-medium px-2.5 py-1 rounded-lg bg-slate-50 text-slate-600 border border-slate-100">
-            {tag}
-          </span>
-        ))}
+      {/* Meta */}
+      <div className="flex flex-wrap gap-3 mb-3">
+        <span className="flex items-center gap-1 text-xs text-gray-600">
+          <MapPin size={10} className="shrink-0" />{job.location}
+        </span>
+        <span className="flex items-center gap-1 text-xs text-gray-600">
+          <Briefcase size={10} className="shrink-0" />{job.jobType}
+        </span>
+        {job.salary && (
+          <span className="text-xs text-emerald-400 font-medium">{formatSalary(job.salary)}</span>
+        )}
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-        <span className="text-xs text-slate-400">Posted {formatDate(job.postedAt)}</span>
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between pt-2.5 border-t border-gray-300">
+        <span className="text-[11px] text-gray-500">{formatDate(job.postedAt)}</span>
+        <div className="flex items-center gap-1.5">
           <button
             onClick={handleTrack}
-            disabled={tracking || tracked}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border transition-colors',
+              'flex items-center gap-1 px-2 py-1 text-[11px] font-medium border rounded transition-colors',
               tracked
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-600'
-                : 'border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                ? 'border-emerald-500/30 text-emerald-400 bg-emerald-500/10'
+                : 'border-gray-300 text-gray-600 hover:border-gray-400'
             )}
           >
-            {tracked ? <Check size={13} /> : <Plus size={13} />}
+            {tracked ? <Check size={11} /> : <Plus size={11} />}
             {tracked ? 'Tracked' : 'Track'}
           </button>
           <a
@@ -159,17 +123,11 @@ export default function JobCard({ job, onSaveToggle }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-semibold text-white bg-primary-600 rounded hover:bg-primary-700 transition-colors"
           >
-            Apply <ArrowUpRight size={13} />
+            Apply <ArrowUpRight size={11} />
           </a>
         </div>
-      </div>
-
-      {/* Hover hint */}
-      <div className="flex items-center gap-1 mt-3 text-[11px] text-primary-500 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Sparkles size={11} />
-        Click to view full details
       </div>
     </Link>
   );

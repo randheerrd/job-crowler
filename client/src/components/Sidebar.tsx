@@ -1,5 +1,5 @@
 import { NavLink, Link } from 'react-router-dom';
-import { LayoutDashboard, ClipboardList, Settings, FileText, LogOut, Zap } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Settings, FileText, LogOut } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAuthStore } from '../store/authStore';
 
@@ -15,25 +15,19 @@ export default function Sidebar() {
   const initials = user?.name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
 
   return (
-    <aside className="w-60 shrink-0 hidden md:flex flex-col bg-gray-100 border-r border-gray-300">
+    <aside className="w-56 shrink-0 hidden md:flex flex-col bg-gray-100 border-r border-gray-300">
       {/* Brand */}
-      <div className="px-5 h-16 flex items-center border-b border-gray-300 shrink-0">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl gradient-btn flex items-center justify-center shrink-0">
-            <Zap size={15} className="text-white" fill="white" />
+      <div className="px-4 h-14 flex items-center border-b border-gray-300 shrink-0">
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <div className="w-6 h-6 rounded bg-primary-600 flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-[10px]">JC</span>
           </div>
-          <div>
-            <p className="font-bold text-gray-900 text-sm leading-tight tracking-tight">JobCrawler</p>
-            <p className="text-gray-500 text-[10px] leading-tight">Find your next role</p>
-          </div>
+          <span className="font-semibold text-gray-900 text-sm">JobCrawler</span>
         </Link>
       </div>
 
       {/* Nav */}
-      <nav className="p-3 flex-1 space-y-0.5 pt-4">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-500 px-3 pb-2">
-          Menu
-        </p>
+      <nav className="p-2 flex-1 space-y-0.5 pt-3">
         {links.map(({ to, icon: Icon, label, end }) => (
           <NavLink
             key={to}
@@ -41,43 +35,40 @@ export default function Sidebar() {
             end={end}
             className={({ isActive }) =>
               cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
+                'flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors',
                 isActive
-                  ? 'bg-primary-600/15 text-primary-400 ring-1 ring-inset ring-primary-500/20'
+                  ? 'bg-primary-600/15 text-primary-400'
                   : 'text-gray-600 hover:bg-gray-200 hover:text-gray-800'
               )
             }
           >
             {({ isActive }) => (
               <>
-                <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
-                <span>{label}</span>
-                {isActive && (
-                  <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0" />
-                )}
+                <Icon size={15} strokeWidth={isActive ? 2.5 : 2} className="shrink-0" />
+                <span className="font-medium">{label}</span>
               </>
             )}
           </NavLink>
         ))}
       </nav>
 
-      {/* User */}
-      <div className="p-3 border-t border-gray-300 shrink-0 space-y-1">
-        <div className="flex items-center gap-3 px-3 py-2.5">
-          <div className="w-8 h-8 rounded-full gradient-btn flex items-center justify-center font-bold text-xs text-white shrink-0 select-none">
+      {/* User section */}
+      <div className="p-2 border-t border-gray-300 shrink-0">
+        <div className="flex items-center gap-2.5 px-3 py-2 rounded mb-0.5">
+          <div className="w-6 h-6 rounded-full bg-primary-600 flex items-center justify-center font-semibold text-[10px] text-white shrink-0">
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900 truncate leading-tight">{user?.name}</p>
-            <p className="text-xs text-gray-500 truncate leading-tight mt-0.5">{user?.email}</p>
+            <p className="text-xs font-medium text-gray-900 truncate">{user?.name}</p>
+            <p className="text-[11px] text-gray-500 truncate">{user?.email}</p>
           </div>
         </div>
         <button
           onClick={clearAuth}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-gray-600 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+          className="flex items-center gap-2.5 w-full px-3 py-2 rounded text-sm text-gray-500 hover:bg-red-500/10 hover:text-red-400 transition-colors"
         >
-          <LogOut size={15} />
-          Sign out
+          <LogOut size={14} />
+          <span>Sign out</span>
         </button>
       </div>
     </aside>
