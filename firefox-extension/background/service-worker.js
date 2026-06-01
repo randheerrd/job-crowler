@@ -301,20 +301,24 @@ browser.alarms.onAlarm.addListener(async alarm => {
   handleStartSync(portals);
 });
 
-// ── Toolbar icon click — Chrome uses sidePanel; Firefox falls back ────────────
-// Chrome: sidePanel.setPanelBehavior makes the panel open automatically on click
-// (onClicked does NOT fire in Chrome when panel behavior is set).
-// Firefox: onClicked fires → try content script toggle → else open popup window.
-const actionAPI = (typeof browser !== 'undefined' && (browser.action || browser.browserAction))
-  || chrome.action;
+// ── Toolbar icon click ────────────────────────────────────────────────────────
+const _api = (typeof browser !== 'undefined' ? (browser.action || browser.browserAction) : null) || chrome.action;
 
-actionAPI.onClicked.addListener(async (tab) => {
-  // Only reaches here on Firefox (Chrome handles via sidePanel)
+_api.onClicked.addListener(async (tab) => {
+  // Chrome: open native side panel
+  if (typeof chrome !== 'undefined' && chrome.sidePanel?.open) {
+    try {
+      await chrome.sidePanel.open({ tabId: tab.id });
+      return;
+    } catch(e) { /* fall through to Firefox path */ }
+  }
+  // Firefox: toggle injected content-script sidebar, or open popup window
+  const _b = typeof browser !== 'undefined' ? browser : chrome;
   try {
-    await browser.tabs.sendMessage(tab.id, { action: 'toggleSidebar' });
+    await _b.tabs.sendMessage(tab.id, { action: 'toggleSidebar' });
   } catch {
-    browser.windows.create({
-      url: browser.runtime.getURL('popup/popup.html'),
+    _b.windows.create({
+      url: _b.runtime.getURL('popup/popup.html'),
       type: 'popup', width: 420, height: 640,
     }).catch(() => {});
   }
@@ -322,16 +326,7 @@ actionAPI.onClicked.addListener(async (tab) => {
 
 // ── Startup ───────────────────────────────────────────────────────────────────
 browser.runtime.onInstalled.addListener(() => {
-  // Chrome: enable side panel to open when toolbar icon is clicked
-  if (typeof chrome !== 'undefined' && chrome.sidePanel?.setPanelBehavior) {
-    chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
-  }
   browser.storage.local.get('user').then(({ user }) => {
     if (user) browser.alarms.create('periodicSync', { periodInMinutes: 240 });
   });
 });
-
-// Also set on service worker startup (survives reinstall)
-if (typeof chrome !== 'undefined' && chrome.sidePanel?.setPanelBehavior) {
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
-}
