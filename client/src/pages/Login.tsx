@@ -45,8 +45,13 @@ export default function Login() {
   const { setAuth } = useAuthStore();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const oauthError = searchParams.get('error');
   const [error, setError] = useState(
-    searchParams.get('error') ? 'OAuth sign-in failed. Please try again or use email.' : ''
+    oauthError === 'google_not_configured' || oauthError === 'linkedin_not_configured'
+      ? 'OAuth is not configured on this server yet. Please sign in with email and password.'
+      : oauthError
+      ? 'OAuth sign-in failed. Please try again or use email and password.'
+      : ''
   );
   const [loading, setLoading] = useState(false);
 

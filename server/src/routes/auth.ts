@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
@@ -66,9 +66,13 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   passport.deserializeUser((user, done) => done(null, user as Express.User));
 }
 
-router.get('/google',
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false }),
-);
+router.get('/google', (req: Request, res: Response, next: express.NextFunction) => {
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    res.redirect(`${FRONTEND_URL}/login?error=google_not_configured`);
+    return;
+  }
+  next();
+}, passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
 
 router.get('/google/callback',
   passport.authenticate('google', { session: false, failureRedirect: `${FRONTEND_URL}/login?error=google` }),
