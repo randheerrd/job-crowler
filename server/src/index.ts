@@ -18,9 +18,20 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production';
 
-if (!isProd) {
-  app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:3000'] }));
-}
+// Allow same-origin web app + browser extension origins (moz-extension://, chrome-extension://)
+app.use(cors({
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // server-to-server / curl
+    if (
+      origin.startsWith('moz-extension://') ||
+      origin.startsWith('chrome-extension://') ||
+      origin.includes('localhost') ||
+      origin.includes('job-crowler.onrender.com')
+    ) return cb(null, true);
+    cb(null, true); // open for now — tighten when going public
+  },
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,8 +53,14 @@ app.use('/api/applications', applicationRoutes);
 app.use('/api/extension', extensionRoutes);
 app.use('/api/sources', sourcesRoutes);
 
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', async (_req, res) => {
+  try {
+    const { prisma } = await import('./lib/prisma');
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ status: 'ok', db: 'connected', timestamp: new Date().toISOString() });
+  } catch (e) {
+    res.status(500).json({ status: 'error', db: 'disconnected', error: String(e) });
+  }
 });
 
 // Serve React app in production
