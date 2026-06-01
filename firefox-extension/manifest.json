@@ -16,7 +16,6 @@
     "activeTab",
     "tabs",
     "alarms",
-    "sidePanel",
     "scripting"
   ],
 
@@ -52,18 +51,13 @@
     "default_title": "Calos — Toggle Sidebar"
   },
 
-  "side_panel": {
-    "default_path": "popup/popup.html"
-  },
-
   "sidebar_action": {
     "default_panel": "popup/popup.html",
     "default_title": "Calos",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png"
-    },
-    "open_at_install": false
+    }
   },
 
   "background": {
