@@ -122,17 +122,26 @@ async function handleCheckWebAppAuth() {
     const tabs = await browser.tabs.query({ url: 'https://job-crowler.onrender.com/*' });
     if (!tabs.length) return { ok: false };
 
-    const results = await browser.tabs.executeScript(tabs[0].id, {
-      code: `(function(){
-        try {
-          const raw = localStorage.getItem('auth-storage');
-          if (!raw) return null;
-          return JSON.parse(raw)?.state?.token || null;
-        } catch(e) { return null; }
-      })()`
-    });
-
-    const token = results?.[0];
+    let token = null;
+    if (typeof chrome !== 'undefined' && chrome.scripting) {
+      // MV3 Chrome
+      const results = await chrome.scripting.executeScript({
+        target: { tabId: tabs[0].id },
+        func: () => {
+          try {
+            const raw = localStorage.getItem('auth-storage');
+            return raw ? JSON.parse(raw)?.state?.token || null : null;
+          } catch(e) { return null; }
+        },
+      });
+      token = results?.[0]?.result;
+    } else {
+      // Firefox MV2 fallback
+      const results = await browser.tabs.executeScript(tabs[0].id, {
+        code: `(function(){try{const r=localStorage.getItem('auth-storage');return r?JSON.parse(r)?.state?.token||null:null}catch(e){return null}})()`
+      });
+      token = results?.[0];
+    }
     if (!token) return { ok: false };
 
     await browser.storage.local.set({ jwtToken: token });
@@ -292,24 +301,37 @@ browser.alarms.onAlarm.addListener(async alarm => {
   handleStartSync(portals);
 });
 
-// ── Toolbar icon click — toggle sidebar on the active tab ─────────────────────
-browser.browserAction.onClicked.addListener(async (tab) => {
+// ── Toolbar icon click — Chrome uses sidePanel; Firefox falls back ────────────
+// Chrome: sidePanel.setPanelBehavior makes the panel open automatically on click
+// (onClicked does NOT fire in Chrome when panel behavior is set).
+// Firefox: onClicked fires → try content script toggle → else open popup window.
+const actionAPI = (typeof browser !== 'undefined' && (browser.action || browser.browserAction))
+  || chrome.action;
+
+actionAPI.onClicked.addListener(async (tab) => {
+  // Only reaches here on Firefox (Chrome handles via sidePanel)
   try {
     await browser.tabs.sendMessage(tab.id, { action: 'toggleSidebar' });
   } catch {
-    // Content script not loaded on this page — open the popup as a fallback window
     browser.windows.create({
       url: browser.runtime.getURL('popup/popup.html'),
-      type: 'popup',
-      width: 390,
-      height: 580,
+      type: 'popup', width: 420, height: 640,
     }).catch(() => {});
   }
 });
 
 // ── Startup ───────────────────────────────────────────────────────────────────
 browser.runtime.onInstalled.addListener(() => {
+  // Chrome: enable side panel to open when toolbar icon is clicked
+  if (typeof chrome !== 'undefined' && chrome.sidePanel?.setPanelBehavior) {
+    chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+  }
   browser.storage.local.get('user').then(({ user }) => {
     if (user) browser.alarms.create('periodicSync', { periodInMinutes: 240 });
   });
 });
+
+// Also set on service worker startup (survives reinstall)
+if (typeof chrome !== 'undefined' && chrome.sidePanel?.setPanelBehavior) {
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+}

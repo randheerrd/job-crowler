@@ -1,7 +1,7 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Calos",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Auto-fetch jobs from LinkedIn, Naukri, Indeed and 20+ portals based on your profile. No manual searching.",
 
   "browser_specific_settings": {
@@ -16,6 +16,11 @@
     "activeTab",
     "tabs",
     "alarms",
+    "sidePanel",
+    "scripting"
+  ],
+
+  "host_permissions": [
     "https://job-crowler.onrender.com/*",
     "https://www.linkedin.com/*",
     "https://in.indeed.com/*",
@@ -38,7 +43,7 @@
     "https://weworkremotely.com/*"
   ],
 
-  "browser_action": {
+  "action": {
     "default_icon": {
       "16":  "icons/icon16.png",
       "48":  "icons/icon48.png",
@@ -47,9 +52,12 @@
     "default_title": "Calos — Toggle Sidebar"
   },
 
+  "side_panel": {
+    "default_path": "popup/popup.html"
+  },
+
   "background": {
-    "scripts": ["background/service-worker.js"],
-    "persistent": false
+    "service_worker": "background/service-worker.js"
   },
 
   "content_scripts": [
