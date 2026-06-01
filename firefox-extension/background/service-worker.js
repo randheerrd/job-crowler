@@ -305,23 +305,24 @@ browser.alarms.onAlarm.addListener(async alarm => {
 const _api = (typeof browser !== 'undefined' ? (browser.action || browser.browserAction) : null) || chrome.action;
 
 _api.onClicked.addListener(async (tab) => {
+  // Firefox: toggle native Firefox sidebar
+  if (typeof browser !== 'undefined' && browser.sidebarAction) {
+    browser.sidebarAction.toggle();
+    return;
+  }
   // Chrome: open native side panel
   if (typeof chrome !== 'undefined' && chrome.sidePanel?.open) {
     try {
       await chrome.sidePanel.open({ tabId: tab.id });
       return;
-    } catch(e) { /* fall through to Firefox path */ }
+    } catch(e) { /* fall through */ }
   }
-  // Firefox: toggle injected content-script sidebar, or open popup window
+  // Last resort fallback
   const _b = typeof browser !== 'undefined' ? browser : chrome;
-  try {
-    await _b.tabs.sendMessage(tab.id, { action: 'toggleSidebar' });
-  } catch {
-    _b.windows.create({
-      url: _b.runtime.getURL('popup/popup.html'),
-      type: 'popup', width: 420, height: 640,
-    }).catch(() => {});
-  }
+  _b.windows.create({
+    url: _b.runtime.getURL('popup/popup.html'),
+    type: 'popup', width: 420, height: 640,
+  }).catch(() => {});
 });
 
 // ── Startup ───────────────────────────────────────────────────────────────────

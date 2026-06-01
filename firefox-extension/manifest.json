@@ -56,6 +56,16 @@
     "default_path": "popup/popup.html"
   },
 
+  "sidebar_action": {
+    "default_panel": "popup/popup.html",
+    "default_title": "Calos",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    },
+    "open_at_install": false
+  },
+
   "background": {
     "service_worker": "background/service-worker.js",
     "scripts": ["background/service-worker.js"]
